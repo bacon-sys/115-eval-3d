@@ -459,8 +459,10 @@ body.no3d #rdMap, body.no3d .tomap { display: none; }
 .rel p { margin: 6px 0 4px; font-size: 16px; color: var(--ink-soft); line-height: 1.6; }
 .relsrc { border: 0; background: none; padding: 2px 0; font: inherit; font-size: 15px; color: var(--rc); font-weight: 700; text-align: left; }
 .relsrc:hover, .relgo:hover b { text-decoration: underline; }
-.relthemes { margin: 12px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 16px; color: var(--ink-soft); }
-.relthm { border: 1.5px solid var(--rc); color: var(--rc); background: var(--paper); border-radius: 999px; padding: 4px 12px; font: inherit; font-size: 16px; font-weight: 700; }
+.relthemes { margin: 14px 0 0; }
+.rtlab { display: block; font-size: 15px; color: var(--ink-soft); margin-bottom: 6px; }
+.rtchips { display: flex; flex-wrap: wrap; gap: 8px; }
+.relthemes .relthm { flex: none; white-space: nowrap; min-height: 0; border: 1.5px solid var(--rc); color: var(--rc); background: var(--paper); border-radius: 999px; padding: 5px 12px; font: inherit; font-size: 16px; font-weight: 700; line-height: 1.3; }
 .relthm:hover { background: var(--paper-2); }
 .keylink span { font-size: 20px; }
 .keylink b { flex: 1; font-size: 17px; }
@@ -4356,7 +4358,7 @@ void main() {
         <p>${le(n.why)}</p>
         <button type="button" class="relsrc" data-read="${n.src}" data-sec="${le(n.sec)}">出處：${n.src} 頁「${le(n.sec)}」→</button>
       </div>`}).join("")}</div>`:""}
-    ${e.length?`<p class="relthemes">所屬主題串聯：${e.map(n=>`<button type="button" class="relthm" data-route="${n.id}" style="--rc:${n.c}">${n.icon} ${le(n.name)}</button>`).join("")}</p>`:""}
+    ${e.length?`<div class="relthemes"><span class="rtlab">所屬主題串聯</span><div class="rtchips">${e.map(n=>`<button type="button" class="relthm" data-route="${n.id}" style="--rc:${n.c}">${n.icon} ${le(n.name)}</button>`).join("")}</div></div>`:""}
   </section>`}function tv(i){return`
     <div class="eyebrow"><span class="tag w">配分 ${i.weight}</span><span class="tag">${i.inds.length} 項指標</span></div>
     <h2 id="panelTitle"><span class="pnum">${Zs[i.n]}</span><span>${le(Na(i))}</span></h2>
