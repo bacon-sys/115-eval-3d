@@ -1142,9 +1142,19 @@ $('#routeBtn').addEventListener('click', () => {
   $('#prev').hidden = $('#next').hidden = true;
 });
 
+// ───────────────────────── 手機：右上角工具收進「選單」，點了某項功能就收起
+const toolsEl = $('.tools');
+function closeMenu() { toolsEl.classList.remove('open'); $('#menuBtn').setAttribute('aria-expanded', 'false'); }
+$('#menuBtn').addEventListener('click', () => { const o = !toolsEl.classList.contains('open'); toolsEl.classList.toggle('open', o); $('#menuBtn').setAttribute('aria-expanded', String(o)); });
+$('#toolsList').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b && b.id !== 'timeBtn' && isNarrow()) closeMenu(); });
+addEventListener('pointerdown', (e) => { if (toolsEl.classList.contains('open') && !toolsEl.contains(e.target)) closeMenu(); });
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && toolsEl.classList.contains('open')) { closeMenu(); e.stopImmediatePropagation(); } }, true);
+
 // ───────────────────────── 操作：點選與滑過
 let hintHidden = false;
-function hideHint() { hintHidden = true; } // 操作說明常駐顯示，不再隱藏
+let hintTimer = 0;
+function hideHint() { hintHidden = true; clearTimeout(hintTimer); $('#hint').classList.add('gone'); } // 操作提示淡出後，可從右上角「？」再看
+function hintLater(ms) { clearTimeout(hintTimer); if (!hintHidden) hintTimer = setTimeout(hideHint, ms); }
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
 function pick(e) {
   ndc.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
@@ -1223,7 +1233,7 @@ function doAct(a) {
 }
 canvas.addEventListener('pointerdown', () => { if (talker) hideBubble(); });
 
-// ───────────────────────── 顯示選項：名牌、島民、物品圖示、弧線、動畫、拍照模式（設定記在這台電腦的瀏覽器）
+// ───────────────────────── 顯示設定：名牌、島民、物品圖示、弧線、動畫（設定記在這台電腦的瀏覽器）
 const OPT_KEYS = [
   ['labels', '指標與構面名牌'], ['walkers', '走動的島民'], ['icons', '島民頭上的物品圖示'], ['arcs', '關聯弧線與路線'], ['motion', '動畫（關閉可讓畫面靜止）'],
 ];
@@ -1239,31 +1249,17 @@ function applyOpts() {
 }
 function wake() { lastActive = performance.now(); }
 function renderViewPanel() {
-  viewPanel.innerHTML = `<div class="vtop"><b>顯示選項</b><button type="button" class="pbtn" id="viewClose" aria-label="關閉顯示選項">×</button></div>
-    ${OPT_KEYS.map(([k, t]) => `<label class="vopt"><input type="checkbox" id="opt-${k}" ${opts[k] ? 'checked' : ''}><span class="sw" aria-hidden="true"></span><span>${t}</span></label>`).join('')}
-    <button type="button" class="vphoto" id="photoBtn">📷 拍照模式<small>隱藏所有按鈕與名牌，方便截圖放進報告或簡報；按 Esc 或右下角按鈕結束</small></button>`;
+  viewPanel.innerHTML = `<div class="vtop"><b>顯示設定</b><button type="button" class="pbtn" id="viewClose" aria-label="關閉顯示設定">×</button></div>
+    ${OPT_KEYS.map(([k, t]) => `<label class="vopt"><input type="checkbox" id="opt-${k}" ${opts[k] ? 'checked' : ''}><span class="sw" aria-hidden="true"></span><span>${t}</span></label>`).join('')}`;
   OPT_KEYS.forEach(([k]) => $('#opt-' + k).addEventListener('change', (e) => { opts[k] = e.target.checked; applyOpts(); }));
   $('#viewClose').addEventListener('click', closeViewPanel);
-  $('#photoBtn').addEventListener('click', () => { closeViewPanel(); setPhoto(true); });
 }
 function openViewPanel() {
+  closeHelp(); closeMenu();
   renderViewPanel(); viewPanel.hidden = false;
   viewPanel.style.right = isNarrow() ? '' : `${innerWidth - $('.tools').getBoundingClientRect().left + 10}px`; $('#viewBtn').setAttribute('aria-expanded', 'true'); }
 function closeViewPanel() { viewPanel.hidden = true; $('#viewBtn').setAttribute('aria-expanded', 'false'); }
 $('#viewBtn').addEventListener('click', () => (viewPanel.hidden ? openViewPanel() : closeViewPanel()));
-// 拍照模式：游標停住 2.5 秒後「結束」按鈕也會淡出，截圖時畫面完全乾淨
-const photoExit = $('#photoExit');
-let photoTimer = 0;
-function setPhoto(on) {
-  document.body.classList.toggle('photo', on);
-  photoExit.hidden = !on;
-  if (on) { if (talker) hideBubble(); pokePhoto(); }
-  wake();
-}
-function pokePhoto() { photoExit.classList.remove('idle'); clearTimeout(photoTimer); photoTimer = setTimeout(() => photoExit.classList.add('idle'), 2500); }
-photoExit.addEventListener('click', () => setPhoto(false));
-addEventListener('pointermove', () => { if (document.body.classList.contains('photo')) pokePhoto(); });
-addEventListener('keydown', (e) => { if (e.key === 'Escape' && document.body.classList.contains('photo')) { setPhoto(false); e.stopImmediatePropagation(); } }, true);
 
 // ───────────────────────── 自動播放導覽（評鑑當天投影用）：依序運鏡＋字幕，文字取自網站現有內容
 const stripTags = (s) => String(s).replace(/<[^>]+>/g, '');
@@ -1283,7 +1279,7 @@ function buildPlay() {
     { kick: '6-3 學校辦理民族教育之創新與省思', t: '亮點與創新', p: hl.text, cam: { target: i63.pos.clone().setY(i63.top + 0.9), dist: 16, dir: new THREE.Vector3(0.5, 0.7, 0.5) }, rel: '6-3', color: i63.dim.c },
     { kick: '評鑑查核', t: '前次評鑑建議的回應', p: prev.text, cam: { target: i63.pos.clone().setY(i63.top + 0.9), dist: 13, dir: new THREE.Vector3(-0.55, 0.62, 0.55) }, color: '#448361' },
     { kick: '相關指標', t: '島民帶著佐證，在相關指標之間往返', p: `吊橋上的島民依網站內文互相引用的 ${RELATIONS.length} 組指標，帶著招生摺頁、問卷、教案、會議資料、經費統計表等佐證來回走動；穿黃衣的小嚮導則從 1-1 依序走到 6-3。`, cam: { target: new THREE.Vector3(0, 1, 0), dist: 48, dir: new THREE.Vector3(0.3, 0.8, 0.52) } },
-    { kick: '開始瀏覽', t: '點平台，看指標內容', p: '點任何一座平台或它的代碼，可以看到指標原文、本頁重點與精選照片；按「閱讀完整內容」可閱讀全文、觀看影片與佐證資料夾。操作方式可看右上角「使用說明」。', cam: 'overview' },
+    { kick: '開始瀏覽', t: '點平台，看指標內容', p: '點任何一座平台或它的代碼，可以看到指標原文、本頁重點與精選照片；按「閱讀完整內容」可閱讀全文、觀看影片與佐證資料夾。操作方式可點右上角的「？」（使用說明）查看。', cam: 'overview' },
   ];
   shots.forEach((s) => { s.dur = Math.min(12, Math.max(6, 2.5 + s.p.length * 0.075)); }); // 慢速：約每秒 13 字的瀏覽速度，每段 6～12 秒
   return shots;
@@ -1322,8 +1318,7 @@ function showShot(k) {
 function startPlay() {
   if (tourOn) endTour();
   if (current) closePanel();
-  closeList(true); closeViewPanel(); if (route) endRoute(); if (talker) hideBubble();
-  setPhoto(false);
+  closeList(true); closeViewPanel(); closeHelp(); closeMenu(); if (route) endRoute(); if (talker) hideBubble();
   play = { shots: buildPlay(), k: 0, t: 0, paused: false };
   document.body.classList.add('playing'); playEl.hidden = false;
   renderPlayToggles();
@@ -1504,6 +1499,7 @@ function loop(now = 0) {
 applyOpts();
 requestAnimationFrame(loop);
 if (location.hash === '#play') setTimeout(startPlay, 1800);
+hintLater(12000);
 
 // ───────────────────────── 開場導覽
 const TOUR = [
@@ -1512,7 +1508,7 @@ const TOUR = [
   { t: '移動與縮放', p: '' },
   { t: '點平台，看指標內容', p: '點任何一座平台或它的代碼，右側會出現指標原文、本頁重點與精選照片；地圖上的弧線會連到內文中互相引用的相關指標。按「閱讀完整內容」可以讀全文、看影片和佐證資料夾。' },
   { t: '跟著島民看指標之間的關聯', p: '吊橋上的島民都有任務：老師、學生、文化教師、校友、行政人員和協作中心委員，各自帶著佐證資料（頭上的小圖示），在內文互相引用的兩項指標之間往返；穿黃衣的小嚮導則從 1-1 依序走到 6-3。點島民，他會告訴你帶著什麼、為什麼要送過去。打開某項指標時，只會留下和它有關的島民。' },
-  { t: '時間有限？用這些工具', p: '右上角可以「搜尋」全站全文、在「導覽路線」選一條路線或一個「主題串聯」（例如泰雅文化課程、學生學習與成效）跨構面一站一站看，或切換成「全文閱讀」；「自動播放」會帶著字幕依序介紹全島，適合投影，可切換慢速與開關背景配樂；「顯示」可以開關名牌、島民與動畫，也有方便截圖的拍照模式；太陽／月亮按鈕可切換白天、黃昏、夜晚，預設跟著台灣現在的時間變化，晚上島上會點燈。', cls: 'tour-tools' },
+  { t: '時間有限？用這些工具', p: '右上角可以「搜尋」全站全文、在「導覽路線」選一條路線或一個「主題串聯」（例如泰雅文化課程、學生學習與成效）跨構面一站一站看，或切換成「全文閱讀」；「自動播放」會帶著字幕依序介紹全島，適合投影，可切換慢速與開關背景配樂；「顯示設定」可以開關名牌、島民與動畫；太陽／月亮按鈕可切換白天、黃昏、夜晚，預設跟著台灣現在的時間變化，晚上島上會點燈。之後想再看操作方式或這份說明，請點右上角的「？」。', cls: 'tour-tools' },
 ];
 const tourEl = $('#tour');
 let tourOn = false, tourStep = 0;
@@ -1520,9 +1516,9 @@ function renderTour() {
   const st = TOUR[tourStep];
   $('#tourCount').textContent = `${tourStep + 1} / ${TOUR.length}`;
   $('#tourTitle').textContent = st.t;
-  $('#tourText').textContent = st.p || (matchMedia('(pointer: coarse)').matches
-    ? '單指拖曳旋轉視角、雙指拖曳移動地圖、雙指捏合縮放。點右上角的山形按鈕（全景）可以隨時回到整體視角。'
-    : '左鍵拖曳旋轉視角、右鍵拖曳移動地圖、滾輪縮放（會朝滑鼠所在位置拉近）。點右上角的「全景」可以隨時回到整體視角。');
+  $('#tourText').textContent = (st.cls === 'tour-tools' && isNarrow() ? '手機版的工具都收在右上角的「選單」裡。' : '') + (st.p || (matchMedia('(pointer: coarse)').matches
+    ? '單指拖曳旋轉視角、雙指拖曳移動地圖、雙指捏合縮放。' + (isNarrow() ? '點右上角「選單」裡的「全景」' : '點右上角的山形按鈕（全景）') + '可以隨時回到整體視角。'
+    : '左鍵拖曳旋轉視角、右鍵拖曳移動地圖、滾輪縮放（會朝滑鼠所在位置拉近）。點右上角的「全景」可以隨時回到整體視角。'));
   $('#tourNext').textContent = tourStep === TOUR.length - 1 ? '開始探索' : '下一步 →';
   $('#tourDots').innerHTML = TOUR.map((_, i) => `<span class="${i === tourStep ? 'on' : ''}"></span>`).join('');
   document.body.classList.remove('tour-legend', 'tour-tools');
@@ -1531,17 +1527,31 @@ function renderTour() {
 function startTour() {
   if (current) closePanel();
   closeList(true);
-  tourOn = true; tourStep = 0; tourEl.hidden = false; renderTour();
+  tourOn = true; tourStep = 0; tourEl.hidden = false; renderTour(); clearTimeout(hintTimer);
   $('#tourNext').focus();
 }
 function endTour() {
-  tourOn = false; tourEl.hidden = true;
+  tourOn = false; tourEl.hidden = true; hintLater(10000);
   document.body.classList.remove('tour-legend', 'tour-tools');
   try { localStorage.setItem('eval3d-tour', '1'); } catch (e) {}
 }
 $('#tourNext').addEventListener('click', () => { if (tourStep < TOUR.length - 1) { tourStep++; renderTour(); } else endTour(); });
 $('#tourSkip').addEventListener('click', endTour);
-$('#tourBtn').addEventListener('click', startTour);
+$('#tourOpen').addEventListener('click', () => { closeHelp(); startTour(); });
+// 右上角「？」：操作方式小卡，可再開啟完整使用說明
+const helpPop = $('#helpPop');
+function openHelp() {
+  closeViewPanel(); closeMenu();
+  helpPop.hidden = false; $('#helpBtn').setAttribute('aria-expanded', 'true');
+  if (isNarrow()) { helpPop.style.right = helpPop.style.top = ''; }
+  else { const b = $('#helpBtn').getBoundingClientRect(); helpPop.style.right = `${innerWidth - $('.tools').getBoundingClientRect().left + 10}px`; helpPop.style.top = `${Math.max(14, Math.min(b.top, innerHeight - helpPop.offsetHeight - 14))}px`; }
+  $('#tourOpen').focus();
+}
+function closeHelp() { helpPop.hidden = true; $('#helpBtn').setAttribute('aria-expanded', 'false'); }
+$('#helpBtn').addEventListener('click', () => (helpPop.hidden ? openHelp() : closeHelp()));
+$('#helpClose').addEventListener('click', closeHelp);
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && !helpPop.hidden) { closeHelp(); e.stopImmediatePropagation(); } }, true);
+addEventListener('pointerdown', (e) => { if (!helpPop.hidden && !helpPop.contains(e.target) && !e.target.closest('#helpBtn')) closeHelp(); });
 addEventListener('keydown', (e) => { if (tourOn && e.key === 'Escape') { endTour(); e.stopImmediatePropagation(); } }, true);
 
 // ───────────────────────── 閱讀頁與網址
