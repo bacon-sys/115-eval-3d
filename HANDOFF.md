@@ -30,7 +30,7 @@ cd /home/claude/src/eval3d && npm install
 
 1. 三年山徑：`cd valley && python3 build.py` → `valley/dist/`
 2. 主網站：`cd eval3d && python3 build.py`（會跑 extract.py、render.py，並把 valley 成品複製到 `site/valley/`）→ `eval3d/site/index.html`、`eval3d/dist/index.html`（artifact 用片段）
-3. 測試：`cd eval3d/site && (python3 -m http.server 8765 >/dev/null 2>&1 &)`，Playwright 加 `--use-gl=swiftshader`；網址加 `?debug` 會開放 `window.__e3d`（主網站）、`window.__vl`（山徑），可用 `advance(秒)` 快轉小人。範例在 `eval3d/test/`。圖片在 main 分支的 `img/`，本機測試看不到照片屬正常。
+3. 測試：`cd eval3d/site && (python3 -m http.server 8765 >/dev/null 2>&1 &)`，Playwright 加 `--use-gl=swiftshader`；網址加 `?debug` 會開放 `window.__e3d`（主網站）、`window.__vl`（山徑），可用 `advance(秒)` 快轉島民。範例在 `eval3d/test/`。圖片在 main 分支的 `img/`，本機測試看不到照片屬正常。
 4. 發布：把 `eval3d/site/index.html` 複製到 main 的 `index.html`、`eval3d/site/valley/index.html` 複製到 main 的 `valley/index.html`，commit、push。
 5. 重新發布 artifact：主網站用 Artifact publish `file_path=eval3d/dist/index.html`、`url`＝主網站 artifact、`root=eval3d/site`、`files=[{"path":"valley/index.html"}]`；山徑用 `valley/dist/valley.html` 發到山徑 artifact（跨對話需先 `action: read` 該 artifact）。
 6. 原始碼有改，也要 commit、push 到 `source` 分支。
@@ -38,9 +38,9 @@ cd /home/claude/src/eval3d && npm install
 
 ## 四、檔案地圖（eval3d/src）
 
-- `app.js`：主程式（場景、島嶼、吊橋、標籤、說明卡、清單、導覽路線、小人、自動播放、顯示選項、效能、晝夜）
+- `app.js`：主程式（場景、島嶼、吊橋、標籤、說明卡、清單、導覽路線、島民、自動播放、顯示選項、效能、晝夜）
 - `home.js`：首頁內容 `SCHOOL`、導覽路線 `ROUTES`（含主題串聯）、相關指標 `RELATIONS`（11 組）、關聯行人 `WALKERS`（角色、物品、圖示）
-- `roles.js`：角色小人造型（泰雅紅白黑＋菱形紋；學生、老師、文化教師、帶隊教師、畢業校友、行政人員、協作中心委員、耆老、七八九年級、小嚮導）。**改了要同步複製到 `valley/src/roles.js`**
+- `roles.js`：角色島民造型（泰雅紅白黑＋菱形紋；學生、老師、文化教師、帶隊教師、畢業校友、行政人員、協作中心委員、耆老、七八九年級、小嚮導）。**改了要同步複製到 `valley/src/roles.js`**
 - `scenery.js`、`items.js`、`animals.js`：造景、17 座平台場景、小動物
 - `reader.js`、`search.js`、`textonly.js`：全文閱讀、搜尋、無 WebGL 版
 - `template.html`：HTML 與全部 CSS
@@ -50,10 +50,12 @@ cd /home/claude/src/eval3d && npm install
 ## 五、已完成的功能（重點）
 
 - 主網站：學校島（獨立山＋三年山徑入口）、6 構面島、17 指標平台；晝夜（`?time=day|dusk|night`）；導覽路線與 6 條主題串聯；相關指標弧線；小動物
-- 小人：11 位關聯行人帶著佐證往返（點了說明「把 X 從 A 送到 B」與出處）；小嚮導依序走 1-1→6-3；圖示隨場景縮放、全景淡出；名牌全景隱藏
-- 指標總覽「相關指標」分頁（點選只留該條弧線與該位小人）
-- 「顯示」選項（名牌／小人／圖示／弧線／動畫開關＋拍照模式）
-- 「自動播放」13 段運鏡字幕，約 2 分鐘，每段 6～12 秒；網址 `#play` 自動開始
+- 島民：11 位關聯行人帶著佐證往返（點了說明「把 X 從 A 送到 B」與出處）；小嚮導依序走 1-1→6-3；圖示隨場景縮放、全景淡出；名牌全景隱藏
+- 指標總覽「相關指標」分頁（點選只留該條弧線與該位島民）
+- 「顯示」選項（名牌／島民／圖示／弧線／動畫開關＋拍照模式）
+- 「自動播放」13 段運鏡字幕；一般速度每段約 5～10 秒（慢速＝原速 6～12 秒，`PLAY_SPEED = 0.8`），字幕列有「慢速」與「♪ 配樂」開關（設定存在 localStorage）；配樂為 `src/music.js` 以 Web Audio 即時合成，無音檔；網址 `#play` 自動開始（需點一下畫面才出聲）
+- 原「導覽」按鈕已改名「使用說明」（6 步操作教學）；與自動播放分開，自動播放最後一段提示「操作方式可看右上角「使用說明」」
+- 網站用語：走動的人物一律稱「島民」（原稱「小人」），小嚮導不變
 - 效能：靜止 30fps、關動畫 8fps，依實測降解析度與關陰影
 - 三年山徑：一位學生依序走 01→21（換年級換服色，走完新一屆接手）、9 位銜接行人；找小嚮導遊戲維持原樣
 
@@ -64,6 +66,7 @@ cd /home/claude/src/eval3d && npm install
 - 服裝配色與紋樣以泰雅族特色為主；不同角色要看得出差別
 - 字體 18px 以上、正式繁體中文；回覆用繁體中文
 - 先提觀察與規劃、確認後再執行（老師要求時）
+- 待討論：老師想再調整右上角各按鈕的安排
 
 ## 七、待辦與未決事項
 

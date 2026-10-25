@@ -1,4 +1,4 @@
-// 角色小人：依角色換上不同的泰雅族服飾（紅、白、黑三色與菱形紋），並加上可辨識的配件與手上的物品
+// 角色島民：依角色換上不同的泰雅族服飾（紅、白、黑三色與菱形紋），並加上可辨識的配件與手上的物品
 // 主網站與三年山徑共用這個檔案（修改後請同步複製到 valley/src/roles.js）
 import * as THREE from 'three';
 
@@ -139,7 +139,7 @@ function iconSprite(emoji, ring) {
   return sp;
 }
 
-// ── 建立角色小人
+// ── 建立角色島民
 // 回傳 { g, legL, legR, armL, armR, head, role, setCarry(bool), icon, prop, headY }
 export function makeRoleWalker(roleKey, { prop = null, icon = null, ring = '#be1e2d' } = {}) {
   const R = ROLES[roleKey];

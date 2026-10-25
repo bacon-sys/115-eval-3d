@@ -462,7 +462,7 @@ body.no3d #rdMap, body.no3d .tomap { display: none; }
 .keylink small { color: var(--rc); font-weight: 700; font-size: 14px; white-space: nowrap; }
 .rnav { flex-wrap: wrap; }
 
-/* 小人對話泡泡 */
+/* 島民對話泡泡 */
 #bubble { position: fixed; left: 0; top: 0; z-index: 8; max-width: min(320px, 80vw); background: var(--paper); color: var(--ink); border-radius: 14px; padding: 12px 14px 10px; box-shadow: 0 6px 20px rgba(42,33,27,.25); font-size: 17px; line-height: 1.6; margin-top: -14px; border-top: 4px solid var(--dc, var(--red)); }
 #bubble::after { content: ""; position: absolute; left: 50%; bottom: -8px; width: 16px; height: 16px; background: inherit; transform: translateX(-50%) rotate(45deg); border-radius: 3px; }
 #bubble p { margin: 0; position: relative; z-index: 1; }
@@ -608,8 +608,8 @@ body.playing .tools, body.playing #legend, body.playing #hint, body.playing #rou
   <button class="tbtn" id="viewBtn" type="button" aria-label="顯示選項" aria-expanded="false" aria-controls="viewPanel">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>顯示</span>
   </button>
-  <button class="tbtn" id="tourBtn" type="button" aria-label="使用導覽">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01"/></svg><span>導覽</span>
+  <button class="tbtn" id="tourBtn" type="button" aria-label="使用說明">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01"/></svg><span>使用說明</span>
   </button>
   <button class="tbtn" id="textBtn" type="button" aria-label="全文閱讀版">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h7a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4Z"/><path d="M20 5h-7a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h7Z"/></svg><span>全文閱讀</span>
