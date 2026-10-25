@@ -560,6 +560,8 @@ body.playing .tools, body.playing #legend, body.playing #hint, body.playing #rou
 #playBar { height: 100%; background: var(--pc, #be1e2d); transform-origin: left; transform: scaleX(0); }
 .pctl { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 .pctl .pbtn.primary { background: var(--pc, #be1e2d); color: #fff; border-color: transparent; }
+.pctl .pbtn.tog[aria-pressed="true"] { background: color-mix(in srgb, var(--pc, #be1e2d) 14%, #fff); border-color: var(--pc, #be1e2d); color: var(--pc, #be1e2d); font-weight: 700; }
+.pctl .pbtn.tog[aria-pressed="false"] .ico { opacity: .4; text-decoration: line-through; }
 #playCount { margin-left: auto; font-size: 15px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
 @media (max-width: 759px) {
   #viewPanel { right: max(16px, env(safe-area-inset-right, 0px)); top: auto; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
@@ -642,6 +644,8 @@ body.playing .tools, body.playing #legend, body.playing #hint, body.playing #rou
       <button type="button" class="pbtn" id="playPrev" aria-label="上一段">‹ 上一段</button>
       <button type="button" class="pbtn primary" id="playPause">❚❚ 暫停</button>
       <button type="button" class="pbtn" id="playNext" aria-label="下一段">下一段 ›</button>
+      <button type="button" class="pbtn tog" id="playSlow" aria-pressed="false" title="切換為較慢的播放速度">慢速</button>
+      <button type="button" class="pbtn tog" id="playMusic" aria-pressed="true" title="開關背景配樂"><span class="ico" aria-hidden="true">♪</span> 配樂</button>
       <span id="playCount"></span>
       <button type="button" class="pbtn" id="playExit">離開</button>
     </div>

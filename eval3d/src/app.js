@@ -6,6 +6,7 @@ import { makeRoleWalker, poseWalker, fadeIcon } from './roles.js';
 import { SCENES } from './items.js';
 import { createReader } from './reader.js';
 import { createSearch, highlight } from './search.js';
+import { createMusic } from './music.js';
 import { makeBoar, makeMuntjac, makeMonkey, makeFlyingSquirrel, wander, sitter, glider } from './animals.js';
 import { animated, buildItem, box, cyl, cone, ico, G, at, C, M, smallTree, plot, milletPlant, canvasTex, mesh } from './scenery.js';
 
@@ -1277,15 +1278,27 @@ function buildPlay() {
   const shots = [
     { kick: '宜蘭縣立大同國中・115 學年度', t: '原住民族實驗教育評鑑', p: '湖中央是學校，周圍六座構面島，再以吊橋連到 17 座指標平台。旗幟顏色代表構面，旗桿越高，配分越高。', cam: 'overview' },
     { kick: '學校願景', t: 'Tayal balay（真正的泰雅人）', p: SCHOOL.vision + ' 四項核心特質：' + SCHOOL.traits.map((x) => x.name).join('、') + '。', cam: { target: new THREE.Vector3(0, SCHOOL_TOP + 1, 0), dist: 21, dir: new THREE.Vector3(0.35, 0.75, 0.56) } },
-    { kick: '三年山徑', t: '七至九年級泰雅文化課程', p: stripTags(SCHOOL.stages), cam: { target: school.signPos.clone().setY(SCHOOL_TOP + 1.6), dist: 14, dir: new THREE.Vector3(-0.45, 0.6, 0.66) } },
+    { kick: '三年山徑', t: '七至九年級泰雅文化課程', p: stripTags(SCHOOL.stages.replace(/以\s*<b>/g, '【').replace(/\s*<\/b>/g, '】')), cam: { target: school.signPos.clone().setY(SCHOOL_TOP + 1.6), dist: 14, dir: new THREE.Vector3(-0.45, 0.6, 0.66) } },
     ...DIMS.map((d) => ({ kick: `構面${NUM[d.n]}・配分 ${d.weight}`, t: dimName(d), p: d.desc, cam: dimShot(d), color: d.c })),
     { kick: '6-3 學校辦理民族教育之創新與省思', t: '亮點與創新', p: hl.text, cam: { target: i63.pos.clone().setY(i63.top + 0.9), dist: 16, dir: new THREE.Vector3(0.5, 0.7, 0.5) }, rel: '6-3', color: i63.dim.c },
     { kick: '評鑑查核', t: '前次評鑑建議的回應', p: prev.text, cam: { target: i63.pos.clone().setY(i63.top + 0.9), dist: 13, dir: new THREE.Vector3(-0.55, 0.62, 0.55) }, color: '#448361' },
     { kick: '相關指標', t: '小人帶著佐證，在相關指標之間往返', p: `吊橋上的小人依網站內文互相引用的 ${RELATIONS.length} 組指標，帶著招生摺頁、問卷、教案、會議資料、經費統計表等佐證來回走動；穿黃衣的小嚮導則從 1-1 依序走到 6-3。`, cam: { target: new THREE.Vector3(0, 1, 0), dist: 48, dir: new THREE.Vector3(0.3, 0.8, 0.52) } },
     { kick: '開始瀏覽', t: '點平台，看指標內容', p: '點任何一座平台或它的代碼，可以看到指標原文、本頁重點與精選照片；按「閱讀完整內容」可閱讀全文、觀看影片與佐證資料夾。', cam: 'overview' },
   ];
-  shots.forEach((s) => { s.dur = Math.min(12, Math.max(6, 2.5 + s.p.length * 0.075)); }); // 約每秒 13 字的瀏覽速度，每段 6～12 秒
+  shots.forEach((s) => { s.dur = Math.min(12, Math.max(6, 2.5 + s.p.length * 0.075)); }); // 慢速：約每秒 13 字的瀏覽速度，每段 6～12 秒
   return shots;
+}
+// 一般速度＝慢速的 0.8 倍時間（每段約 5～10 秒）；設定記在這台電腦的瀏覽器
+const PLAY_SPEED = 0.8;
+let playSlow = false, playMusicOn = true;
+try { playSlow = localStorage.getItem('eval3d-play-slow') === '1'; playMusicOn = localStorage.getItem('eval3d-play-music') !== '0'; } catch (e) {}
+const music = createMusic();
+function shotDur(s) { return s.dur * (playSlow ? 1 : PLAY_SPEED); }
+function syncMusic() { if (play && playMusicOn && !play.paused) music.start(); else music.stop(); }
+function renderPlayToggles() {
+  $('#playSlow').setAttribute('aria-pressed', String(playSlow));
+  $('#playMusic').setAttribute('aria-pressed', String(playMusicOn));
+  $('#playMusic').setAttribute('aria-label', playMusicOn ? '背景配樂：開（按一下關閉）' : '背景配樂：關（按一下開啟）');
 }
 let play = null; // { shots, k, t, paused }
 const playEl = $('#play');
@@ -1313,6 +1326,7 @@ function startPlay() {
   setPhoto(false);
   play = { shots: buildPlay(), k: 0, t: 0, paused: false };
   document.body.classList.add('playing'); playEl.hidden = false;
+  renderPlayToggles();
   setPlayPaused(false);
   showShot(0);
   $('#playPause').focus();
@@ -1320,12 +1334,14 @@ function startPlay() {
 function endPlay() {
   if (!play) return;
   play = null; playEl.hidden = true; document.body.classList.remove('playing');
+  syncMusic();
   updateOffsetTarget();
   const o = overview(); flyTo(o.pos, o.target);
   if (location.hash === '#play') history.replaceState(null, '', location.pathname + location.search);
 }
 function setPlayPaused(p) {
   play.paused = p;
+  syncMusic();
   $('#playPause').textContent = p ? '▶ 繼續' : '❚❚ 暫停';
   $('#playPause').setAttribute('aria-label', p ? '繼續播放' : '暫停播放');
 }
@@ -1341,14 +1357,15 @@ function updatePlay(dt) {
       camera.position.x = tg.x + x * Math.cos(a) - z * Math.sin(a);
       camera.position.z = tg.z + x * Math.sin(a) + z * Math.cos(a);
     }
-    if (play.t >= s.dur) {
+    if (play.t >= shotDur(s)) {
       if (play.k < play.shots.length - 1) showShot(play.k + 1);
-      else { setPlayPaused(true); play.t = s.dur; $('#playPause').textContent = '↺ 重播'; play.done = true; }
+      else { setPlayPaused(true); play.t = shotDur(s); $('#playPause').textContent = '↺ 重播'; play.done = true; }
     }
   }
-  $('#playBar').style.transform = `scaleX(${Math.min(1, play.t / s.dur)})`;
+  $('#playBar').style.transform = `scaleX(${Math.min(1, play.t / shotDur(s))})`;
 }
 $('#playBtn').addEventListener('click', startPlay);
+if (window.__e3d) window.__e3d.playDurs = () => buildPlay().map(shotDur);
 $('#playPause').addEventListener('click', () => {
   if (play.done) { play.done = false; setPlayPaused(false); showShot(0); return; }
   setPlayPaused(!play.paused);
@@ -1356,6 +1373,18 @@ $('#playPause').addEventListener('click', () => {
 $('#playPrev').addEventListener('click', () => { play.done = false; showShot(Math.max(0, play.k - 1)); });
 $('#playNext').addEventListener('click', () => { play.done = false; if (play.k < play.shots.length - 1) showShot(play.k + 1); });
 $('#playExit').addEventListener('click', endPlay);
+$('#playSlow').addEventListener('click', () => {
+  const f = play ? play.t / shotDur(play.shots[play.k]) : 0; // 切換時保留這一段已播放的比例
+  playSlow = !playSlow;
+  try { localStorage.setItem('eval3d-play-slow', playSlow ? '1' : '0'); } catch (e) {}
+  if (play) play.t = f * shotDur(play.shots[play.k]);
+  renderPlayToggles();
+});
+$('#playMusic').addEventListener('click', () => {
+  playMusicOn = !playMusicOn;
+  try { localStorage.setItem('eval3d-play-music', playMusicOn ? '1' : '0'); } catch (e) {}
+  renderPlayToggles(); syncMusic();
+});
 addEventListener('keydown', (e) => {
   if (!play) return;
   if (e.key === 'Escape') { endPlay(); e.stopImmediatePropagation(); }
@@ -1363,7 +1392,8 @@ addEventListener('keydown', (e) => {
   else if (e.key === 'ArrowRight') { $('#playNext').click(); e.stopImmediatePropagation(); }
   else if (e.key === 'ArrowLeft') { $('#playPrev').click(); e.stopImmediatePropagation(); }
 }, true);
-controls.addEventListener('start', () => { if (play && !play.paused) setPlayPaused(true); }); // 使用者自己拖曳時先暫停
+controls.addEventListener('start', () => { if (play && !play.paused) setPlayPaused(true); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) music.stop(); else syncMusic(); }); // 切到別的分頁時先停配樂 // 使用者自己拖曳時先暫停
 
 // ───────────────────────── 迴圈
 function resize() {
@@ -1482,7 +1512,7 @@ const TOUR = [
   { t: '移動與縮放', p: '' },
   { t: '點平台，看指標內容', p: '點任何一座平台或它的代碼，右側會出現指標原文、本頁重點與精選照片；地圖上的弧線會連到內文中互相引用的相關指標。按「閱讀完整內容」可以讀全文、看影片和佐證資料夾。' },
   { t: '跟著小人看指標之間的關聯', p: '吊橋上的小人都有任務：老師、學生、文化教師、校友、行政人員和協作中心委員，各自帶著佐證資料（頭上的小圖示），在內文互相引用的兩項指標之間往返；穿黃衣的小嚮導則從 1-1 依序走到 6-3。點小人，他會告訴你帶著什麼、為什麼要送過去。打開某項指標時，只會留下和它有關的小人。' },
-  { t: '時間有限？用這些工具', p: '右上角可以「搜尋」全站全文、在「導覽路線」選一條路線或一個「主題串聯」（例如泰雅文化課程、學生學習與成效）跨構面一站一站看，或切換成「全文閱讀」；「自動播放」會帶著字幕依序介紹全島，適合投影；「顯示」可以開關名牌、小人與動畫，也有方便截圖的拍照模式；太陽／月亮按鈕可切換白天、黃昏、夜晚，預設跟著台灣現在的時間變化，晚上島上會點燈。', cls: 'tour-tools' },
+  { t: '時間有限？用這些工具', p: '右上角可以「搜尋」全站全文、在「導覽路線」選一條路線或一個「主題串聯」（例如泰雅文化課程、學生學習與成效）跨構面一站一站看，或切換成「全文閱讀」；「自動播放」會帶著字幕依序介紹全島，適合投影，可切換慢速與開關背景配樂；「顯示」可以開關名牌、小人與動畫，也有方便截圖的拍照模式；太陽／月亮按鈕可切換白天、黃昏、夜晚，預設跟著台灣現在的時間變化，晚上島上會點燈。', cls: 'tour-tools' },
 ];
 const tourEl = $('#tour');
 let tourOn = false, tourStep = 0;
