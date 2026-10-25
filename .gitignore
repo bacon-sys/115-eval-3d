@@ -4,3 +4,4 @@ build/
 dist/
 shots/
 __pycache__/
+package-lock.json
