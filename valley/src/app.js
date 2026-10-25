@@ -1268,7 +1268,7 @@ const stars = (() => {
 const PHASES = {
   day:   { sky: ['#c9dce2', '#dde8e3', '#e4ebe4'], fog: '#e4ebe4', hs: '#f3f6ee', hg: '#8a8f6c', hi: 1.25, sc: '#fff1dc', si: 2.1, sp: [22, 38, 18], water: '#79aebb', cloud: '#ffffff' },
   dusk:  { sky: ['#e9a77c', '#f2cba3', '#e8d6c2'], fog: '#e6cdb5', hs: '#ffd8b0', hg: '#6d6670', hi: 0.95, sc: '#ffad6b', si: 1.4, sp: [40, 14, 6], water: '#7e92b4', cloud: '#f7d2b8' },
-  night: { sky: ['#0e1830', '#1b2946', '#26354f'], fog: '#22314c', hs: '#7083b8', hg: '#1c2029', hi: 0.5, sc: '#a9bde8', si: 0.35, sp: [-18, 38, 14], water: '#2c4660', cloud: '#5a6681' },
+  night: { sky: ['#0e1830', '#1b2946', '#26354f'], fog: '#22314c', hs: '#a8b8e4', hg: '#4c5670', hi: 1.45, sc: '#cdd9f5', si: 1.1, sp: [-18, 38, 14], water: '#2f4f78', cloud: '#5a6681' }, // 夜晚：與主網站相同，月光加亮
 };
 const _c1 = new THREE.Color(), _c2 = new THREE.Color();
 const mixC = (a, b, t) => '#' + _c1.set(a).lerp(_c2.set(b), t).getHexString();

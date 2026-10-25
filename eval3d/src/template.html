@@ -545,7 +545,10 @@ body.hide-labels #labels { display: none; }
 
 /* 右上角工具列：分組（組間加大間距），使用說明為圓形「?」；手機收進「選單」 */
 #toolsList { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
-#toolsList .grp { margin-top: 12px; }
+#toolsList .tgl { align-self: flex-end; margin: 4px 4px -4px 0; padding: 1px 10px; border-radius: 999px; background: rgba(255,253,248,.85); color: var(--ink-soft); font-size: 14px; font-weight: 700; letter-spacing: .12em; line-height: 1.6; }
+#toolsList .tgl:first-child { margin-top: 0; }
+#toolsList .grp { margin-top: 6px; }
+body.is-night #toolsList .tgl { background: rgba(255,253,248,.9); }
 #menuBtn { display: none; }
 .tbtn.help { align-self: flex-end; width: 48px; height: 48px; padding: 0; justify-content: center; border-radius: 999px; }
 .tbtn.help span { display: none; }
@@ -562,7 +565,9 @@ body.hide-labels #labels { display: none; }
   .tools.open #toolsList { display: flex; }
   .tools.open #toolsList .tbtn span { display: inline; }
   #toolsList .tbtn { box-shadow: none; padding: 8px 14px; min-height: 46px; }
-  #toolsList .grp { margin-top: 8px; }
+  #toolsList .grp { margin-top: 4px; }
+  #toolsList .tgl { align-self: flex-start; background: none; margin: 6px 0 -2px 6px; padding: 0; font-size: 13px; }
+  #toolsList .tgl:first-child { margin-top: 0; }
   .tbtn.help { align-self: stretch; width: auto; height: auto; padding: 8px 14px; justify-content: flex-start; }
   .tbtn.help span { display: inline; }
   #helpPop { left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); width: auto; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
@@ -612,13 +617,15 @@ body.playing .tools, body.playing #legend, body.playing #hint, body.playing #rou
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>選單</span>
   </button>
 <div id="toolsList">
+  <div class="tgl" aria-hidden="true">看畫面</div>
   <button class="tbtn" id="home" type="button" aria-label="回到全景">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20 9.5 8l4 6 2.5-4L21 20Z"/><circle cx="17" cy="5" r="1.6"/></svg><span>全景</span>
   </button>
   <button class="tbtn" id="playBtn" type="button" aria-label="自動播放導覽">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="m10 8 5 2.5-5 2.5Z"/><path d="M8 21h8"/></svg><span>自動播放</span>
   </button>
-  <button class="tbtn grp" id="listBtn" type="button" aria-pressed="false" aria-label="指標總覽">
+  <div class="tgl" aria-hidden="true">找內容</div>
+  <button class="tbtn" id="listBtn" type="button" aria-pressed="false" aria-label="指標總覽">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2"/><circle cx="4.5" cy="12" r="1.2"/><circle cx="4.5" cy="18" r="1.2"/></svg><span>指標總覽</span>
   </button>
   <button class="tbtn" id="routeBtn" type="button" aria-label="導覽路線">
@@ -630,7 +637,8 @@ body.playing .tools, body.playing #legend, body.playing #hint, body.playing #rou
   <button class="tbtn" id="textBtn" type="button" aria-label="全文閱讀版">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h7a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4Z"/><path d="M20 5h-7a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h7Z"/></svg><span>全文閱讀</span>
   </button>
-  <button class="tbtn grp" id="timeBtn" type="button" aria-label="場景時間">
+  <div class="tgl" aria-hidden="true">設定</div>
+  <button class="tbtn" id="timeBtn" type="button" aria-label="場景時間">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg><span>依現在時間</span>
   </button>
   <button class="tbtn" id="viewBtn" type="button" aria-label="顯示設定" aria-expanded="false" aria-controls="viewPanel">

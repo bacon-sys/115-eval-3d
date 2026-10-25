@@ -1,0 +1,10 @@
+const { chromium } = require('playwright');
+const out=process.argv[2]||'/tmp/shots/night';
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});
+const p=await b.newPage({viewport:{width:1366,height:820}});
+await p.addInitScript(()=>{try{localStorage.setItem('eval3d-tour','1')}catch(e){}});
+await p.goto('http://localhost:8765/?time=night');await p.waitForTimeout(12000);
+await p.screenshot({path:out+'_all.png'});
+await p.goto('http://localhost:8765/?time=night#school');await p.waitForTimeout(9000);
+await p.evaluate(()=>document.getElementById('close')&&document.getElementById('close').click());await p.waitForTimeout(2500);
+await p.screenshot({path:out+'_school.png'});await b.close();})();

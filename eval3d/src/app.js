@@ -442,7 +442,7 @@ const stars = (() => {
 const PHASES = {
   day:   { sky: ['#c6dbe2', '#dbe7e4', '#dfe8e6'], fog: '#dfe8e6', hs: '#f3f6ee', hg: '#7f8f84', hi: 1.3, sc: '#fff1dc', si: 2.0, sp: [26, 44, 22], water: '#7fb1ba', cloud: '#ffffff' },
   dusk:  { sky: ['#e9a77c', '#f2cba3', '#e8d6c2'], fog: '#e6cdb5', hs: '#ffd8b0', hg: '#6d6670', hi: 1.0, sc: '#ffad6b', si: 1.35, sp: [44, 16, 10], water: '#7e92b4', cloud: '#f7d2b8' },
-  night: { sky: ['#0e1830', '#1b2946', '#26354f'], fog: '#22314c', hs: '#7083b8', hg: '#1c2029', hi: 0.55, sc: '#a9bde8', si: 0.35, sp: [-20, 40, -18], water: '#2c4660', cloud: '#5a6681' },
+  night: { sky: ['#0e1830', '#1b2946', '#26354f'], fog: '#22314c', hs: '#a8b8e4', hg: '#4c5670', hi: 1.45, sc: '#cdd9f5', si: 1.1, sp: [-20, 40, -18], water: '#2f4f78', cloud: '#5a6681' }, // 夜晚：天空與水面維持深藍，月光加亮讓島面與構面顏色看得清楚
 };
 const _c1 = new THREE.Color(), _c2 = new THREE.Color();
 const mixC = (a, b, t) => _c1.set(a).lerp(_c2.set(b), t).getHexString();
