@@ -1,7 +1,7 @@
 const { chromium } = require('playwright');
 const D=process.env.SHOTS||'/tmp/shots/';
 (async()=>{
- const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});
+ const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const p=await b.newPage({viewport:{width:1440,height:900}});
  const errs=[]; p.on('pageerror',e=>errs.push(e.message));
  await p.addInitScript(()=>{try{localStorage.setItem('sannian-tour','1')}catch(e){}});

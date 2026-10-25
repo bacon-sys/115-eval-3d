@@ -30,7 +30,7 @@ cd /home/claude/src/eval3d && npm install
 
 1. 三年山徑：`cd valley && python3 build.py` → `valley/dist/`
 2. 主網站：`cd eval3d && python3 build.py`（會跑 extract.py、render.py，並把 valley 成品複製到 `site/valley/`）→ `eval3d/site/index.html`、`eval3d/dist/index.html`（artifact 用片段）
-3. 測試：`cd eval3d/site && (python3 -m http.server 8765 >/dev/null 2>&1 &)`，Playwright 加 `--use-gl=swiftshader`；網址加 `?debug` 會開放 `window.__e3d`（主網站）、`window.__vl`（山徑），可用 `advance(秒)` 快轉島民。範例在 `eval3d/test/`。圖片在 main 分支的 `img/`，本機測試看不到照片屬正常。
+3. 測試：`cd eval3d/site && (python3 -m http.server 8765 >/dev/null 2>&1 &)`，Playwright 加 `--use-angle=swiftshader --enable-unsafe-swiftshader`（舊的 `--use-gl=swiftshader` 會讓下方操作提示畫不出來，屬測試環境問題；山徑較重，必要時再用 `--use-gl`）；網址加 `?debug` 會開放 `window.__e3d`（主網站）、`window.__vl`（山徑），可用 `advance(秒)` 快轉島民。範例在 `eval3d/test/`。圖片在 main 分支的 `img/`，本機測試看不到照片屬正常。
 4. 發布：把 `eval3d/site/index.html` 複製到 main 的 `index.html`、`eval3d/site/valley/index.html` 複製到 main 的 `valley/index.html`，commit、push。
 5. 重新發布 artifact：主網站用 Artifact publish `file_path=eval3d/dist/index.html`、`url`＝主網站 artifact、`root=eval3d/site`、`files=[{"path":"valley/index.html"}]`；山徑用 `valley/dist/valley.html` 發到山徑 artifact（跨對話需先 `action: read` 該 artifact）。
 6. 原始碼有改，也要 commit、push 到 `source` 分支。
@@ -52,7 +52,9 @@ cd /home/claude/src/eval3d && npm install
 - 主網站：學校島（獨立山＋三年山徑入口）、6 構面島、17 指標平台；晝夜（`?time=day|dusk|night`）；導覽路線與 6 條主題串聯；相關指標弧線；小動物
 - 島民：11 位關聯行人帶著佐證往返（點了說明「把 X 從 A 送到 B」與出處）；小嚮導依序走 1-1→6-3；圖示隨場景縮放、全景淡出；名牌全景隱藏
 - 指標總覽「相關指標」分頁（點選只留該條弧線與該位島民）
-- 右上角工具列分組，每組上方有小標題（看畫面／找內容／設定，`.tgl`）：①全景、自動播放 ②指標總覽、導覽路線、搜尋、全文閱讀 ③晝夜（獨立按鈕）、顯示設定（名牌／島民／圖示／弧線／動畫開關；拍照模式已依老師要求移除）④圓形「？」＝操作方式小卡＋「看完整使用說明（6 步）」。手機（寬度 <760px）全部收進右上角「選單」，點了某項就收起（晝夜除外）
+- 右上角工具列（參酌 Notion AI 建議，以留白分組、不加小標題，class `tgrp`）：①回到全景（較淡）②指標總覽、搜尋、全文閱讀 ③導覽路線、自動播放 ④輔助：顯示設定（較小）＋小圓鈕「晝夜」「？」。顯示設定面板上方有「場景時間」四選一，下方為五個開關（拍照模式已移除）。「？」＝操作方式小卡＋「看完整使用說明（6 步）」。手機（<760px）全部收進右上角「選單」。三年山徑同樣配置：回到全景｜清單｜三年路徑、找小嚮導｜晝夜、？
+- 底部圖例半透明、標題「構面圖例・配分」；操作提示先寫「點平台或代碼看指標內容」
+- 未採用的建議：「自動播放→自動導覽」（會再與「導覽路線」撞名）、「全文閱讀→閱讀模式」（全站文字皆稱全文閱讀）
 - 夜晚光線（主網站與山徑相同）：天空、水面維持深藍，月光加亮（hemi 1.45、sun 1.1），讓島面與構面顏色看得清楚
 - 下方操作提示：第一次拖曳／縮放或約 10 秒後淡出（開場使用說明開著時不倒數，關閉後 10 秒）；之後由「？」查看
 - 「自動播放」13 段運鏡字幕；一般速度每段約 5～10 秒（慢速＝原速 6～12 秒，`PLAY_SPEED = 0.8`），字幕列有「慢速」與「♪ 配樂」開關（設定存在 localStorage）；配樂為 `src/music.js` 以 Web Audio 即時合成，無音檔；網址 `#play` 自動開始（需點一下畫面才出聲）

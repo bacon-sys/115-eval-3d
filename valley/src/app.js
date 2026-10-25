@@ -994,7 +994,9 @@ addEventListener('keydown', (e) => {
 });
 
 let hintHidden = false;
-function hideHint() { if (hintHidden) return; hintHidden = true; $('#hint').classList.add('gone'); }
+let hintTimer = 0;
+function hideHint() { clearTimeout(hintTimer); if (hintHidden) return; hintHidden = true; $('#hint').classList.add('gone'); } // 淡出後可從右上角「？」再看操作方式
+function hintLater(ms) { clearTimeout(hintTimer); if (!hintHidden) hintTimer = setTimeout(hideHint, ms); }
 $('#legendToggle').addEventListener('click', () => {
   const l = $('#legend'); const open = l.classList.toggle('open');
   $('#legendToggle').setAttribute('aria-expanded', open);
@@ -1033,7 +1035,7 @@ canvas.addEventListener('pointermove', (e) => {
   if (isl !== hovered) { hovered = isl; ISLANDS.forEach((i) => i.labelEl.classList.toggle('hover', i === isl)); }
 });
 canvas.addEventListener('pointerleave', () => { hovered = null; ISLANDS.forEach((i) => i.labelEl.classList.remove('hover')); });
-controls.addEventListener('start', () => { fly = null; controls.enabled = true; });
+controls.addEventListener('start', () => { fly = null; controls.enabled = true; hideHint(); });
 
 // ───────────────────────── 對話泡泡
 const bubble = $('#bubble');
@@ -1330,7 +1332,7 @@ function updateTime() {
   if (btn) {
     btn.querySelector('svg').innerHTML = p.night > 0.5 ? MOON_SVG : SUN_SVG;
     btn.querySelector('span').textContent = TIME_LABEL[timeMode];
-    btn.setAttribute('aria-label', `場景時間：${TIME_LABEL[timeMode]}（點選切換）`);
+    btn.setAttribute('aria-label', `場景時間：${TIME_LABEL[timeMode]}（點選切換）`); btn.title = `場景時間：${TIME_LABEL[timeMode]}（點一下切換）`;
   }
 }
 updateTime();
@@ -1348,7 +1350,7 @@ const TOUR = [
   { t: '台地邊框的顏色是學習構面', p: '綠色是人與自然、橘色是人與社會、桃紅是人與他人、紫色是人與自己。每個年級都有這四個構面。每個主題依主要學習重點歸入一個構面，實際課程常跨越多個構面。' },
   { t: '點一座台地，走進課程', p: '台地上的小物件就是課程裡的細項。點台地可以看學習內容，以及它和其他年級怎麼銜接。' },
   { t: '山徑上的人都有任務', p: '有一位學生從 01 依序走到 21，每座台地停一下，走完就由新的一屆接手（畫面以白、紅、黑三種泰雅服色區分七、八、九年級）。部落耆老和學生則帶著竹材、苧麻、苧麻線等物品（頭上的小圖示），沿著年級之間的銜接往返。點他們，會說明帶著什麼、要走去哪裡。' },
-  { t: '還有更多看法', p: '右上角的「清單」可以快速找課程，「三年路徑」會畫出年級之間的銜接線。也可以點畫面裡的人物聽他說話，或玩「找小嚮導」。太陽／月亮按鈕可以切換白天、黃昏、夜晚，預設跟著台灣現在的時間，晚上山徑會點燈。' },
+  { t: '還有更多看法', cls: 'tools', p: '右上角的「清單」可以快速找課程，「三年路徑」會畫出年級之間的銜接線。也可以點畫面裡的人物聽他說話，或玩「找小嚮導」。太陽／月亮小按鈕可以切換白天、黃昏、夜晚，預設跟著台灣現在的時間，晚上山徑會點燈。之後想再看操作方式或這份說明，請點右上角的「？」。' },
 ];
 const tourEl = $('#tour');
 let tourOn = false, tourStep = 0;
@@ -1356,26 +1358,49 @@ function renderTour() {
   const st = TOUR[tourStep];
   $('#tourCount').textContent = `${tourStep + 1} / ${TOUR.length}`;
   $('#tourTitle').textContent = st.t;
-  $('#tourText').textContent = st.p;
+  $('#tourText').textContent = (st.cls === 'tools' && isNarrow() ? '手機版的工具都收在右上角的「選單」裡。' : '') + st.p;
   $('#tourNext').textContent = tourStep === TOUR.length - 1 ? '開始探索' : '下一步 →';
   $('#tourDots').innerHTML = TOUR.map((_, i) => `<span class="${i === tourStep ? 'on' : ''}"></span>`).join('');
   document.body.classList.toggle('tour-legend', tourStep === 2);
-  document.body.classList.toggle('tour-tools', tourStep === 4);
+  document.body.classList.toggle('tour-tools', st.cls === 'tools');
 }
 function startTour() {
   if (current) closePanel();
   closeList();
-  tourOn = true; tourStep = 0; tourEl.hidden = false; renderTour();
+  closeHelp(); closeMenu();
+  tourOn = true; tourStep = 0; tourEl.hidden = false; renderTour(); clearTimeout(hintTimer);
   $('#tourNext').focus();
 }
 function endTour() {
-  tourOn = false; tourEl.hidden = true;
+  tourOn = false; tourEl.hidden = true; hintLater(10000);
   document.body.classList.remove('tour-legend', 'tour-tools');
   try { localStorage.setItem('sannian-tour', '1'); } catch (e) {}
 }
 $('#tourNext').addEventListener('click', () => { if (tourStep < TOUR.length - 1) { tourStep++; renderTour(); } else endTour(); });
 $('#tourSkip').addEventListener('click', endTour);
-$('#tourBtn').addEventListener('click', startTour);
+$('#tourOpen').addEventListener('click', () => { closeHelp(); startTour(); });
+// 右上角「？」：操作方式小卡（與主網站一致）
+const helpPop = $('#helpPop');
+function openHelp() {
+  closeMenu();
+  helpPop.hidden = false; $('#helpBtn').setAttribute('aria-expanded', 'true');
+  if (isNarrow()) { helpPop.style.right = helpPop.style.top = ''; }
+  else { const b = $('#helpBtn').getBoundingClientRect(); helpPop.style.right = `${innerWidth - $('.tools').getBoundingClientRect().left + 10}px`; helpPop.style.top = `${Math.max(14, Math.min(b.top, innerHeight - helpPop.offsetHeight - 14))}px`; }
+  $('#tourOpen').focus();
+}
+function closeHelp() { helpPop.hidden = true; $('#helpBtn').setAttribute('aria-expanded', 'false'); }
+$('#helpBtn').addEventListener('click', () => (helpPop.hidden ? openHelp() : closeHelp()));
+$('#helpClose').addEventListener('click', closeHelp);
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && !helpPop.hidden) { closeHelp(); e.stopImmediatePropagation(); } }, true);
+addEventListener('pointerdown', (e) => { if (!helpPop.hidden && !helpPop.contains(e.target) && !e.target.closest('#helpBtn')) closeHelp(); });
+// 手機：工具收進「選單」，點了某項功能就收起（晝夜除外）
+const toolsEl = $('.tools');
+function closeMenu() { toolsEl.classList.remove('open'); $('#menuBtn').setAttribute('aria-expanded', 'false'); }
+$('#menuBtn').addEventListener('click', () => { const o = !toolsEl.classList.contains('open'); toolsEl.classList.toggle('open', o); $('#menuBtn').setAttribute('aria-expanded', String(o)); });
+$('#toolsList').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b && b.id !== 'timeBtn' && isNarrow()) closeMenu(); });
+addEventListener('pointerdown', (e) => { if (toolsEl.classList.contains('open') && !toolsEl.contains(e.target)) closeMenu(); });
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && toolsEl.classList.contains('open')) { closeMenu(); e.stopImmediatePropagation(); } }, true);
+hintLater(12000);
 {
   let seen = false;
   try { seen = localStorage.getItem('sannian-tour') === '1'; } catch (e) {}

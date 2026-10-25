@@ -506,7 +506,8 @@ function updateTime() {
   const p = timeMode === 'auto' ? phaseAt(taipeiHour()) : mixPhase(timeMode, timeMode, 0);
   applyPhase(p);
   const btn = $('#timeBtn');
-  if (btn) { btn.querySelector('svg').innerHTML = p.night > 0.5 ? MOON_SVG : SUN_SVG; btn.querySelector('span').textContent = TIME_LABEL[timeMode]; btn.setAttribute('aria-label', `場景時間：${TIME_LABEL[timeMode]}（點選切換）`); }
+  if (btn) { btn.querySelector('svg').innerHTML = p.night > 0.5 ? MOON_SVG : SUN_SVG; btn.querySelector('span').textContent = TIME_LABEL[timeMode]; btn.setAttribute('aria-label', `場景時間：${TIME_LABEL[timeMode]}（點選切換）`); btn.title = `場景時間：${TIME_LABEL[timeMode]}（點一下切換）`; }
+  document.querySelectorAll('.vtime button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.t === timeMode)));
 }
 updateTime();
 setInterval(() => { if (timeMode === 'auto') updateTime(); }, 60000);
@@ -1250,9 +1251,13 @@ function applyOpts() {
 function wake() { lastActive = performance.now(); }
 function renderViewPanel() {
   viewPanel.innerHTML = `<div class="vtop"><b>顯示設定</b><button type="button" class="pbtn" id="viewClose" aria-label="關閉顯示設定">×</button></div>
+    <div class="vsec">場景時間</div>
+    <div class="vtime" role="group" aria-label="場景時間">${TIME_MODES.map((t) => `<button type="button" data-t="${t}" aria-pressed="${t === timeMode}">${TIME_LABEL[t]}</button>`).join('')}</div>
+    <div class="vsec">畫面元素</div>
     ${OPT_KEYS.map(([k, t]) => `<label class="vopt"><input type="checkbox" id="opt-${k}" ${opts[k] ? 'checked' : ''}><span class="sw" aria-hidden="true"></span><span>${t}</span></label>`).join('')}`;
   OPT_KEYS.forEach(([k]) => $('#opt-' + k).addEventListener('change', (e) => { opts[k] = e.target.checked; applyOpts(); }));
   $('#viewClose').addEventListener('click', closeViewPanel);
+  viewPanel.querySelectorAll('.vtime button').forEach((b) => b.addEventListener('click', () => { timeMode = b.dataset.t; updateTime(); sendValleyTime(); }));
 }
 function openViewPanel() {
   closeHelp(); closeMenu();
@@ -1508,7 +1513,7 @@ const TOUR = [
   { t: '移動與縮放', p: '' },
   { t: '點平台，看指標內容', p: '點任何一座平台或它的代碼，右側會出現指標原文、本頁重點與精選照片；地圖上的弧線會連到內文中互相引用的相關指標。按「閱讀完整內容」可以讀全文、看影片和佐證資料夾。' },
   { t: '跟著島民看指標之間的關聯', p: '吊橋上的島民都有任務：老師、學生、文化教師、校友、行政人員和協作中心委員，各自帶著佐證資料（頭上的小圖示），在內文互相引用的兩項指標之間往返；穿黃衣的小嚮導則從 1-1 依序走到 6-3。點島民，他會告訴你帶著什麼、為什麼要送過去。打開某項指標時，只會留下和它有關的島民。' },
-  { t: '時間有限？用這些工具', p: '右上角可以「搜尋」全站全文、在「導覽路線」選一條路線或一個「主題串聯」（例如泰雅文化課程、學生學習與成效）跨構面一站一站看，或切換成「全文閱讀」；「自動播放」會帶著字幕依序介紹全島，適合投影，可切換慢速與開關背景配樂；「顯示設定」可以開關名牌、島民與動畫；太陽／月亮按鈕可切換白天、黃昏、夜晚，預設跟著台灣現在的時間變化，晚上島上會點燈。之後想再看操作方式或這份說明，請點右上角的「？」。', cls: 'tour-tools' },
+  { t: '時間有限？用這些工具', p: '右上角可以「搜尋」全站全文、在「導覽路線」選一條路線或一個「主題串聯」（例如泰雅文化課程、學生學習與成效）跨構面一站一站看，或切換成「全文閱讀」；「自動播放」會帶著字幕依序介紹全島，適合投影，可切換慢速與開關背景配樂；「顯示設定」可以開關名牌、島民與動畫；太陽／月亮小按鈕可切換白天、黃昏、夜晚（顯示設定裡也能直接選），預設跟著台灣現在的時間變化，晚上島上會點燈。之後想再看操作方式或這份說明，請點右上角的「？」。', cls: 'tour-tools' },
 ];
 const tourEl = $('#tour');
 let tourOn = false, tourStep = 0;
@@ -1517,8 +1522,8 @@ function renderTour() {
   $('#tourCount').textContent = `${tourStep + 1} / ${TOUR.length}`;
   $('#tourTitle').textContent = st.t;
   $('#tourText').textContent = (st.cls === 'tour-tools' && isNarrow() ? '手機版的工具都收在右上角的「選單」裡。' : '') + (st.p || (matchMedia('(pointer: coarse)').matches
-    ? '單指拖曳旋轉視角、雙指拖曳移動地圖、雙指捏合縮放。' + (isNarrow() ? '點右上角「選單」裡的「全景」' : '點右上角的山形按鈕（全景）') + '可以隨時回到整體視角。'
-    : '左鍵拖曳旋轉視角、右鍵拖曳移動地圖、滾輪縮放（會朝滑鼠所在位置拉近）。點右上角的「全景」可以隨時回到整體視角。'));
+    ? '單指拖曳旋轉視角、雙指拖曳移動地圖、雙指捏合縮放。' + (isNarrow() ? '點右上角「選單」裡的「回到全景」' : '點右上角的「回到全景」') + '可以隨時回到整體視角。'
+    : '左鍵拖曳旋轉視角、右鍵拖曳移動地圖、滾輪縮放（會朝滑鼠所在位置拉近）。點右上角的「回到全景」可以隨時回到整體視角。'));
   $('#tourNext').textContent = tourStep === TOUR.length - 1 ? '開始探索' : '下一步 →';
   $('#tourDots').innerHTML = TOUR.map((_, i) => `<span class="${i === tourStep ? 'on' : ''}"></span>`).join('');
   document.body.classList.remove('tour-legend', 'tour-tools');

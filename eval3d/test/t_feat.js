@@ -2,7 +2,7 @@ const { chromium } = require('playwright');
 const D=process.env.SHOTS||'/tmp/shots/';
 const vp=process.argv[2]||'d';
 (async()=>{
- const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});
+ const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const p=await b.newPage(vp==='m'?{viewport:{width:390,height:844},hasTouch:true,isMobile:true}:{viewport:{width:1366,height:820}});
  const errs=[]; p.on('pageerror',e=>errs.push(e.message)); p.on('console',m=>{if(m.type()==='error'&&!/ERR_TUNNEL|Failed to load/.test(m.text()))errs.push(m.text())});
  await p.addInitScript(()=>{try{localStorage.setItem('eval3d-tour','1')}catch(e){}});

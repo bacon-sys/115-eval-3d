@@ -1,6 +1,6 @@
 const { chromium } = require('playwright');
 (async()=>{
- const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});
+ const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const p=await b.newPage({viewport:{width:800,height:600}});
  const errs=[]; p.on('pageerror',e=>errs.push(e.message));
  await p.addInitScript(()=>{try{localStorage.setItem('eval3d-tour','1')}catch(e){}});
