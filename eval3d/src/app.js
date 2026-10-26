@@ -669,7 +669,7 @@ function placeWalkerTags() {
     if (txt !== w.tagText) { w.tag.textContent = txt; w.tagText = txt; }
     if (!w.tagOn) { w.tag.style.display = 'block'; w.tagOn = true; }
     w.tag.style.transform = `translate(${_tg.x}px, ${_tg.y}px) translate(-50%, -100%)`;
-    if (w.kind !== 'guide') w.tag.style.setProperty('--dc', (w.dir > 0 ? w.B : w.A).dim.c);
+    if (w.kind !== 'guide') w.tag.style.setProperty('--dc', (w.dir > 0 ? w.B : w.A).dim.ui);
   }
 }
 
@@ -744,11 +744,40 @@ function overview() {
   const vf = Math.sin((camera.fov * Math.PI) / 360);
   const hfov = 2 * Math.atan(Math.tan((camera.fov * Math.PI) / 360) * aspect);
   const need = Math.max(R * 1.12 / vf, R * 1.05 / Math.sin(hfov / 2));
-  const dist = Math.min(150, need);
-  ovDist = dist;
+  let dist = Math.min(150, need);
   const dir = (narrow ? new THREE.Vector3(0, 0.92, 0.4) : new THREE.Vector3(0, 0.8, 0.6)).normalize();
   const target = new THREE.Vector3(0, 0, narrow ? 2 : 1.5);
+  if (narrow) dist = fitLabels(target, dir, dist);
+  ovDist = dist;
   return { pos: target.clone().addScaledVector(dir, dist), target };
+}
+// 手機全景：除了島嶼，也把每個代碼與名牌的位置算進來——先依標籤範圍調整縮放並上下置中，再確認全部落在安全範圍（左右各 12px、避開上方標題與下方圖例）
+const _fitCam = new THREE.PerspectiveCamera();
+function fitLabels(target, dir, dist) {
+  if (!labels.length) return dist;
+  _fitCam.fov = camera.fov; _fitCam.aspect = innerWidth / innerHeight; _fitCam.near = camera.near; _fitCam.far = camera.far; _fitCam.updateProjectionMatrix();
+  const W = innerWidth, H = innerHeight, pad = 12, top = 96, bottom = 80;
+  const bounds = () => {
+    _fitCam.position.copy(target).addScaledVector(dir, dist); _fitCam.lookAt(target); _fitCam.updateMatrixWorld();
+    const b = { x0: 1e9, x1: -1e9, y0: 1e9, y1: -1e9 };
+    for (const L of labels) {
+      const v = L.pos.clone().project(_fitCam), x = (v.x * 0.5 + 0.5) * W, y = (-v.y * 0.5 + 0.5) * H;
+      const half = L.ind ? 23 : Math.min(L.fw || 90, 150) / 2;
+      b.x0 = Math.min(b.x0, x - half); b.x1 = Math.max(b.x1, x + half); b.y0 = Math.min(b.y0, y - 40); b.y1 = Math.max(b.y1, y + 6);
+    }
+    return b;
+  };
+  const up = new THREE.Vector3(0, 0, -1); // 畫面往上 ≈ 世界 -z
+  for (let pass = 0; pass < 5; pass++) {
+    const b = bounds();
+    const sc = Math.max((b.x1 - b.x0) / (W - 2 * pad), (b.y1 - b.y0) / (H - top - bottom));
+    const wpp = (2 * dist * Math.tan((camera.fov * Math.PI) / 360)) / H; // 目標深度每像素的世界長度
+    const dy = (b.y0 + b.y1) / 2 - (top + H - bottom) / 2;
+    target.addScaledVector(up, -dy * wpp * 1.05);
+    dist *= Math.max(0.8, Math.min(1.3, sc));
+  }
+  for (let k = 0; k < 12; k++) { const b = bounds(); if (b.x0 >= pad && b.x1 <= W - pad && b.y0 >= top && b.y1 <= H - bottom) break; dist *= 1.03; }
+  return dist;
 }
 let fly = null;
 let ovDist = 80; // 全景距離（由 overview() 更新），用來決定何時顯示指標名稱
@@ -782,15 +811,15 @@ function addLabel(html, cls, pos, onClick, vars = {}) {
   for (const k in vars) el.style.setProperty(k, vars[k]);
   el.addEventListener('click', onClick);
   labelsEl.appendChild(el);
-  const L = { el, pos, pri: cls.includes('dlabel') ? 2 : cls.includes('slabel') ? 3 : 1 };
+  const L = { el, pos, pri: cls.includes('dlabel') ? 2 : cls.includes('slabel') ? 3 : 1, vl: cls.includes('vlabel') };
   labels.push(L);
   return L;
 }
 for (const d of DIMS) {
-  d.label = addLabel(`<span class="dn">構面${NUM[d.n]}</span><span class="dt">${dimName(d)}</span><span class="dw">${d.weight}</span>`, 'dlabel', d.labelPos, () => openDim(d.n), { '--dc': d.c });
+  d.label = addLabel(`<span class="dn">構面${NUM[d.n]}</span><span class="dt">${dimName(d)}</span><span class="dw">${d.weight}</span>`, 'dlabel', d.labelPos, () => openDim(d.n), { '--dc': d.ui });
   d.label.el.setAttribute('aria-label', `${d.title}，配分 ${d.weight}`);
   for (const ind of d.inds) {
-    ind.label = addLabel(`<span class="code">${ind.code}</span><span class="nm">${ind.short}</span>`, 'ilabel', ind.labelPos, () => openInd(ind.code), { '--dc': d.c });
+    ind.label = addLabel(`<span class="code">${ind.code}</span><span class="nm">${ind.short}</span>`, 'ilabel', ind.labelPos, () => openInd(ind.code), { '--dc': d.ui });
     ind.label.el.setAttribute('aria-label', `指標 ${ind.code} ${ind.title}`);
     ind.label.ind = ind;
   }
@@ -809,21 +838,29 @@ function updateNameMode() {
   if (current) showNames = true;
   else if (showNames && r > 0.92) showNames = false;
   else if (!showNames && r < 0.85) showNames = true;
+  if (document.body.classList.contains('names') !== showNames && isNarrow()) for (const L of labels) if (!L.ind) L.fw = 0; // 手機構面名牌寬度會隨配分顯示與否改變
   document.body.classList.toggle('names', showNames);
 }
 function placeLabels() {
   updateNameMode();
   for (const L of labels) { project(L.pos, L); if (L.ind) L.y -= L.ind.lift * 30; }
   placed.length = 0;
-  const order = labels.slice().sort((a, b) => b.pri - a.pri || a.z - b.z);
+  const narrow = isNarrow();
+  const prio = (L) => (narrow && (L.ind || L.vl) ? 2.5 : L.pri); // 手機：可點的指標代碼與三年山徑入口優先完整顯示，構面名牌讓位
+  const order = labels.slice().sort((a, b) => prio(b) - prio(a) || a.z - b.z);
+  const W = innerWidth;
   for (const L of order) {
     const el = L.el;
     if (!L.fw) { el.classList.remove('compact'); L.fw = el.offsetWidth || 120; L.fh = el.offsetHeight || 36; }
     let compact = false, stem = 0, rect = null;
     // 先試正上方（可拉高），再試左右錯開，盡量讓每個標籤都完整顯示
     const tryAt = (w, h) => {
-      const dxs = L.ind ? [0, -w * 0.5, w * 0.5, -w * 0.9, w * 0.9] : [0];
-      for (const st of [0, 30, 60, 90]) for (const dx of dxs) { const r = { x: L.x + dx - w / 2 - 3, y: L.y - st - h - 6, w: w + 6, h: h + 6 }; if (!overlaps(r)) return [r, st, dx]; }
+      const dxs = L.ind ? [0, -w * 0.5, w * 0.5, -w * 0.9, w * 0.9] : narrow ? [0, -w * 0.35, w * 0.35, -w * 0.7, w * 0.7] : [0];
+      const sts = !L.ind && narrow ? [0, -30, 30, -60, 60, -90] : [0, 30, 60, 90]; // 手機構面名牌：先試往下錯開（負值＝往下）
+      for (const st of sts) for (let dx of dxs) {
+        if (L.x > 0 && L.x < W) dx = Math.max(12 + w / 2 - L.x, Math.min(W - 12 - w / 2 - L.x, dx)); // 錨點在畫面內時，標籤不超出左右邊界
+        const r = { x: L.x + dx - w / 2 - 3, y: L.y - st - h - 6, w: w + 6, h: h + 6 }; if (!overlaps(r)) return [r, st, dx];
+      }
       return null;
     };
     const wantName = !L.ind || showNames || hovered === L.ind || L.el.matches(':hover, :focus-visible');
@@ -831,9 +868,11 @@ function placeLabels() {
     let res = wantName ? (tryAt(L.fw, L.fh) || (forced ? [{ x: L.x - L.fw / 2, y: L.y - L.fh, w: L.fw, h: L.fh }, 0] : null)) : null;
     L.el.classList.toggle('lift', !!forced);
     if (!res && L.ind) { compact = true; res = tryAt(46, 34) || [{ x: L.x - 23, y: L.y - 40, w: 46, h: 34 }, 0]; }
-    if (!res) res = [{ x: L.x - L.fw / 2, y: L.y - L.fh, w: L.fw, h: L.fh }, 0];
+    const crowd = !res && !L.ind && !L.vl && L.pri === 2 && narrow; // 手機：構面名牌找不到空位時暫時隱藏（拉近或看圖例仍可得知），不擋住代碼
+    if (!res) { let dx = 0; if (L.x > 0 && L.x < W) dx = Math.max(12 + L.fw / 2 - L.x, Math.min(W - 12 - L.fw / 2 - L.x, 0)); res = [{ x: L.x + dx - L.fw / 2, y: L.y - L.fh, w: L.fw, h: L.fh }, 0, dx]; }
+    if (crowd !== el.classList.contains('crowd')) el.classList.toggle('crowd', crowd);
     [rect, stem] = res; const dx = res[2] || 0;
-    if (L.vis && !el.classList.contains('active')) placed.push(rect);
+    if (L.vis && !el.classList.contains('active') && !crowd) placed.push(rect);
     if (compact !== el.classList.contains('compact')) el.classList.toggle('compact', compact);
     el.style.setProperty('--stem', stem + 'px');
     el.style.transform = `translate(${L.x + dx}px, ${L.y - stem}px) translate(-50%, -100%)`;
@@ -875,7 +914,7 @@ function relatedSection(ind) {
   if (!rel.length && !themes.length) return '';
   return `<section><h3>相關指標<small>地圖上的弧線連到這些指標</small></h3>
     ${rel.length ? `<div class="rels">${rel.map((r) => { const o = byCode(r.other); return `
-      <div class="rel" style="--rc:${o.dim.c}">
+      <div class="rel" style="--rc:${o.dim.ui}">
         <button type="button" class="relgo" data-ind="${o.code}"><span class="code">${o.code}</span><b>${esc(o.title)}</b><span class="go" aria-hidden="true">→</span></button>
         <p>${esc(r.why)}</p>
         <button type="button" class="relsrc" data-read="${r.src}" data-sec="${esc(r.sec)}">出處：${r.src} 頁「${esc(r.sec)}」→</button>
@@ -950,7 +989,7 @@ function markActive() {
 function openInd(code, { fromHash = false } = {}) {
   const ind = byCode(code);
   current = { type: 'ind', key: code };
-  panel.style.setProperty('--dc', ind.dim.c); panel.style.setProperty('--tint', ind.dim.tint);
+  panel.style.setProperty('--dc', ind.dim.ui); panel.style.setProperty('--tint', ind.dim.tint);
   setPanel(indCard(ind));
   $('#prev').hidden = $('#next').hidden = false;
   markActive();
@@ -961,7 +1000,7 @@ function openInd(code, { fromHash = false } = {}) {
 function openDim(n) {
   const d = DIMS[n - 1];
   current = { type: 'dim', key: n };
-  panel.style.setProperty('--dc', d.c); panel.style.setProperty('--tint', d.tint);
+  panel.style.setProperty('--dc', d.ui); panel.style.setProperty('--tint', d.tint);
   setPanel(dimCard(d));
   $('#prev').hidden = $('#next').hidden = false;
   markActive();
@@ -1030,7 +1069,7 @@ function relationRows() {
   return RELATIONS.map((r, k) => {
     const A = byCode(r.a), B = byCode(r.b), w = walkers.find((x) => x.rel === r);
     const who = w ? `${w.cfg.icon} ${w.roleName}帶著「${esc(w.cfg.item)}」` : '';
-    return `<div class="relrow${relFocus === k ? ' on' : ''}" data-k="${k}" style="--ca:${A.dim.c};--cb:${B.dim.c}">
+    return `<div class="relrow${relFocus === k ? ' on' : ''}" data-k="${k}" style="--ca:${A.dim.ui};--cb:${B.dim.ui}">
       <button type="button" class="relmain" data-rel="${k}" aria-label="在地圖上看 ${r.a} 與 ${r.b} 的關聯">
         <span class="rpair"><b class="ra">${r.a}</b><i aria-hidden="true">→</i><b class="rb">${r.b}</b><span class="rnames">${esc(A.short)} → ${esc(B.short)}</span></span>
         <span class="rwhy">${esc(r.why)}</span>
@@ -1058,7 +1097,7 @@ function renderList() {
     listBody.innerHTML = tabs + `
     <button type="button" class="lrow school" data-school><span class="num">🏫</span><span class="lname">學校簡介與願景<small>學校基本資料、Tayal balay、gaga 四項核心特質</small></span></button>
     ${DIMS.map((d) => `
-    <div class="lgroup" style="--c:${d.c}">
+    <div class="lgroup" style="--c:${d.ui}">
       <h3><button type="button" data-dim="${d.n}">構面${NUM[d.n]}　${esc(dimName(d))}</button><span>${d.weight}</span></h3>
       ${d.inds.map((i) => `<button type="button" class="lrow" data-ind="${i.code}"><span class="num">${i.code}</span><span class="lname">${esc(i.title)}</span></button>`).join('')}
     </div>`).join('')}`;
@@ -1218,7 +1257,7 @@ function talkTo(w) {
   }
   bubble.innerHTML = `<p>${esc(text)}</p><div class="bacts">${acts.map((x, i) => `<button type="button" class="${x.more ? 'bmore' : 'bgo'}" data-i="${i}">${esc(x.t)}${x.more ? '' : ' →'}</button>`).join('')}</div>`;
   bubble.hidden = false;
-  bubble.style.setProperty('--dc', w.kind === 'guide' ? w.at.dim.c : (w.dir > 0 ? w.B : w.A).dim.c);
+  bubble.style.setProperty('--dc', w.kind === 'guide' ? w.at.dim.ui : (w.dir > 0 ? w.B : w.A).dim.ui);
   bubble.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { const x = acts[+b.dataset.i]; hideBubble(); doAct(x.a); }));
   hideHint();
 }
@@ -1280,7 +1319,7 @@ function buildPlay() {
     { kick: '宜蘭縣立大同國中・115 學年度', t: '原住民族實驗教育評鑑', p: '湖中央是學校，周圍六座構面島，再以吊橋連到 17 座指標平台。旗幟顏色代表構面，旗桿越高，配分越高。', cam: 'overview' },
     { kick: '學校願景', t: 'Tayal balay（真正的泰雅人）', p: SCHOOL.vision + ' 四項核心特質：' + SCHOOL.traits.map((x) => x.name).join('、') + '。', cam: { target: new THREE.Vector3(0, SCHOOL_TOP + 1, 0), dist: 21, dir: new THREE.Vector3(0.35, 0.75, 0.56) } },
     { kick: '三年山徑', t: '七至九年級泰雅文化課程', p: stripTags(SCHOOL.stages), cam: { target: school.signPos.clone().setY(SCHOOL_TOP + 1.6), dist: 14, dir: new THREE.Vector3(-0.45, 0.6, 0.66) } },
-    ...DIMS.map((d) => ({ kick: `構面${NUM[d.n]}・配分 ${d.weight}`, t: dimName(d), p: d.desc, cam: dimShot(d), color: d.c })),
+    ...DIMS.map((d) => ({ kick: `構面${NUM[d.n]}・配分 ${d.weight}`, t: dimName(d), p: d.desc, cam: dimShot(d), color: d.ui })),
     { kick: '6-3 學校辦理民族教育之創新與省思', t: '亮點與創新', p: hl.text, cam: { target: i63.pos.clone().setY(i63.top + 0.9), dist: 16, dir: new THREE.Vector3(0.5, 0.7, 0.5) }, rel: '6-3', color: i63.dim.c },
     { kick: '評鑑查核', t: '前次評鑑建議的回應', p: prev.text, cam: { target: i63.pos.clone().setY(i63.top + 0.9), dist: 13, dir: new THREE.Vector3(-0.55, 0.62, 0.55) }, color: '#448361' },
     { kick: '相關指標', t: '島民帶著佐證，在相關指標之間往返', p: `吊橋上的島民依網站內文互相引用的 ${RELATIONS.length} 組指標，帶著招生摺頁、問卷、教案、會議資料、經費統計表等佐證來回走動；穿黃衣的小嚮導則從 1-1 依序走到 6-3。`, cam: { target: new THREE.Vector3(0, 1, 0), dist: 48, dir: new THREE.Vector3(0.3, 0.8, 0.52) } },

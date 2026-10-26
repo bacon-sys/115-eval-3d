@@ -220,7 +220,7 @@ body.focused .slabel, body.focused .vlabel { opacity: .0; pointer-events: none; 
 }
 
 /* ───────── 閱讀頁 ───────── */
-:root { --d1: #337EA9; --d2: #448361; --d3: #9065B0; --d4: #D9730D; --d5: #CB912F; --d6: #C14C8A;
+:root { --d1: #337EA9; --d2: #448361; --d3: #9065B0; --d4: #B45F0B; --d5: #9A6E24; --d6: #C14C8A;
   --n-gray: #F1F1EF; --n-brown: #F4EEEE; --n-orange: #FBECDD; --n-yellow: #FBF3DB; --n-green: #EDF3EC; --n-blue: #E7F3F8; --n-purple: #F6F3F9; --n-pink: #FAF1F5; --n-red: #FDEBEC; }
 #reader { position: fixed; inset: 0; z-index: 40; background: var(--paper); display: flex; flex-direction: column; opacity: 0; transition: opacity .25s; }
 #reader.in { opacity: 1; }
@@ -392,6 +392,17 @@ figure.embed.local iframe { height: 520px; }
   details.tg .tb { padding: 2px 12px 4px; }
 }
 
+/* 手機全景：構面名牌不顯示配分（圖例可查）；擠不下時暫時隱藏、不擋代碼 */
+@media (max-width: 759px) { body:not(.names) .dlabel .dw { display: none; } .dlabel { padding: 5px 10px; } }
+.dlabel.crowd { opacity: 0; pointer-events: none; }
+/* 四欄基本資料表：手機改為每列「欄名｜資料」 */
+@media (max-width: 759px) {
+  .prose table.kv4, .prose table.kv4 tbody { display: block; }
+  .prose table.kv4 tr { display: grid; grid-template-columns: 7.8em minmax(0, 1fr); }
+  .prose table.kv4 th, .prose table.kv4 td { border-right: 0; border-bottom: 1px solid var(--line); }
+  .prose table.kv4 tr:last-child > :nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .prose table.kv4 tr:nth-child(even) td { background: transparent; }
+}
 /* 三年山徑（站內開啟） */
 #valleyView { position: fixed; inset: 0; z-index: 50; background: #dfe8e3; display: flex; flex-direction: column; }
 #valleyView .vbar { flex: none; display: flex; align-items: center; gap: 12px; padding: calc(10px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); background: var(--paper); border-bottom: 1px solid var(--line); box-shadow: inset 0 4px 0 #6a4432; }

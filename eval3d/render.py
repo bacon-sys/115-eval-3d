@@ -85,11 +85,14 @@ def table(inner, a):
             elif s == '</td>': cur.append('<br>'.join(cell)); intd = False
             elif intd: cell.append(l)
     hr = a.get('header-row') == 'true'; hc = a.get('header-column') == 'true'
-    out = ['<div class="tablewrap"><table class="%s">' % ('fit' if a.get('fit-page-width') == 'true' else '')]
+    # 「欄名｜資料｜欄名｜資料」四欄表（如學校基本資料）：第 3 欄也是欄名；手機改為兩欄（CSS .kv4）
+    kv = hc and not hr and rows and all(len(row) == 4 for row in rows)
+    cls = ' '.join(x for x in ['fit' if a.get('fit-page-width') == 'true' else '', 'kv4' if kv else ''] if x)
+    out = ['<div class="tablewrap"><table class="%s">' % cls]
     for r, row in enumerate(rows):
         out.append('<tr>')
         for c, cell in enumerate(row):
-            th = (hr and r == 0) or (hc and c == 0)
+            th = (hr and r == 0) or (hc and c == 0) or (kv and c == 2)
             tg = 'th' if th else 'td'
             sc = ' scope="col"' if hr and r == 0 else (' scope="row"' if th else '')
             out.append(f'<{tg}{sc}>{inline(cell)}</{tg}>')

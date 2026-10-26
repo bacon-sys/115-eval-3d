@@ -16,7 +16,7 @@ export function createReader({ DIMS, onClose }) {
     const d = dimOf(ref); if (d) return d.title;
     const i = indOf(ref); return `${i.code} ${i.title}`;
   };
-  const colorOf = (ref) => { const d = dimOf(ref) || (indOf(ref) || {}).dim; return d ? d.c : '#be1e2d'; };
+  const colorOf = (ref) => { const d = dimOf(ref) || (indOf(ref) || {}).dim; return d ? d.ui : '#be1e2d'; };
 
   const root = $('#reader'), art = $('#rdArticle'), side = $('#rdSide'), crumb = $('#rdCrumb'), pager = $('#rdPager'), scroller = $('#rdScroll');
   let cur = null;
@@ -28,7 +28,7 @@ export function createReader({ DIMS, onClose }) {
     let h = link('home', '🏫 首頁：學校簡介與願景');
     if (cur === 'home' && sec.length) h += secList(sec);
     for (const d of DIMS) {
-      h += `<div class="sg" style="--dc:${d.c}">${link('d' + d.n, `<span class="sn">構面${NUM[d.n]}</span>${esc(dimName(d))}<span class="sw">${d.weight}</span>`, ' dim')}`;
+      h += `<div class="sg" style="--dc:${d.ui}">${link('d' + d.n, `<span class="sn">構面${NUM[d.n]}</span>${esc(dimName(d))}<span class="sw">${d.weight}</span>`, ' dim')}`;
       for (const i of d.inds) {
         h += link(i.code, `<span class="sc">${i.code}</span>${esc(i.title)}`, ' ind');
         if (i.code === cur && sec.length) h += secList(sec);
@@ -46,10 +46,10 @@ export function createReader({ DIMS, onClose }) {
     if (ref === 'home') return `<header class="ph0 home"><div class="kick">宜蘭縣立大同國民中學・115 學年度原住民族實驗教育評鑑</div><h1>大同國中 115 學年度實驗教育評鑑網站</h1>
       <p class="hn">本網站為 Notion 評鑑網站之 3D 導覽版，內容與 Notion 正式版相同。網站更新：__UPDATED__</p></header>`;
     const d = dimOf(ref);
-    if (d) return `<header class="ph0" style="--dc:${d.c};--tint:${d.tint}"><div class="kick">構面${NUM[d.n]}・配分 ${d.weight}</div><h1><span class="pi">${d.icon}</span>${esc(dimName(d))}</h1>
+    if (d) return `<header class="ph0" style="--dc:${d.ui};--tint:${d.tint}"><div class="kick">構面${NUM[d.n]}・配分 ${d.weight}</div><h1><span class="pi">${d.icon}</span>${esc(dimName(d))}</h1>
       <button type="button" class="tomap" data-map="d${d.n}">在 3D 地圖中查看</button></header>`;
     const i = indOf(ref);
-    return `<header class="ph0" style="--dc:${i.dim.c};--tint:${i.dim.tint}"><div class="kick"><a href="#pd${i.dim.n}">構面${NUM[i.dim.n]}　${esc(dimName(i.dim))}</a></div>
+    return `<header class="ph0" style="--dc:${i.dim.ui};--tint:${i.dim.tint}"><div class="kick"><a href="#pd${i.dim.n}">構面${NUM[i.dim.n]}　${esc(dimName(i.dim))}</a></div>
       <h1><span class="code">${i.code}</span><span>${i.icon} ${esc(i.title)}</span></h1>
       <button type="button" class="tomap" data-map="${i.code}">在 3D 地圖中查看</button></header>`;
   }

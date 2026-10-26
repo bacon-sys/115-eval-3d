@@ -733,11 +733,39 @@ function overview() {
   const aspect = innerWidth / innerHeight;
   const half = narrow ? 18.5 : 31;
   const hf = Math.tan((camera.fov * Math.PI) / 360) * aspect;
-  const dist = Math.min(85, Math.max(narrow ? 34 : 32, half / hf));
+  let dist = Math.min(85, Math.max(narrow ? 34 : 32, half / hf));
   const dir = narrow ? new THREE.Vector3(0, 0.86, 0.5) : new THREE.Vector3(0, 0.64, 0.77);
   dir.normalize();
   const target = new THREE.Vector3(-0.5, 5.5, narrow ? -0.5 : 1.5);
+  if (narrow) dist = fitLabels(target, dir, dist);
   return { pos: target.clone().addScaledVector(dir, dist), target };
+}
+// 手機全景：把台地編號與年級地名牌的位置算進來——依標籤範圍調整縮放並上下置中，再確認全部落在安全範圍（與主網站相同做法）
+const _fitCam = new THREE.PerspectiveCamera();
+function fitLabels(target, dir, dist) {
+  _fitCam.fov = camera.fov; _fitCam.aspect = innerWidth / innerHeight; _fitCam.near = camera.near; _fitCam.far = camera.far; _fitCam.updateProjectionMatrix();
+  const W = innerWidth, H = innerHeight, pad = 12, top = 136, bottom = 80;
+  const pts = ISLANDS.map((i) => [new THREE.Vector3(i.x, i.labelH, i.z), 22, 46]).concat(gradeSigns.map((g) => [g.pos, 55, 46]));
+  const bounds = () => {
+    _fitCam.position.copy(target).addScaledVector(dir, dist); _fitCam.lookAt(target); _fitCam.updateMatrixWorld();
+    const b = { x0: 1e9, x1: -1e9, y0: 1e9, y1: -1e9 };
+    for (const [p, half, h] of pts) {
+      const v = p.clone().project(_fitCam), x = (v.x * 0.5 + 0.5) * W, y = (-v.y * 0.5 + 0.5) * H;
+      b.x0 = Math.min(b.x0, x - half); b.x1 = Math.max(b.x1, x + half); b.y0 = Math.min(b.y0, y - h); b.y1 = Math.max(b.y1, y + 6);
+    }
+    return b;
+  };
+  const upW = new THREE.Vector3(0, 0, -1); // 畫面往上 ≈ 世界 -z
+  for (let pass = 0; pass < 5; pass++) {
+    const b = bounds();
+    const sc = Math.max((b.x1 - b.x0) / (W - 2 * pad), (b.y1 - b.y0) / (H - top - bottom));
+    const wpp = (2 * dist * Math.tan((camera.fov * Math.PI) / 360)) / H;
+    const cx = (b.x0 + b.x1) / 2 - W / 2, cy = (b.y0 + b.y1) / 2 - (top + H - bottom) / 2;
+    target.x += cx * wpp; target.addScaledVector(upW, -cy * wpp * 1.05);
+    dist *= Math.max(0.8, Math.min(1.3, sc));
+  }
+  for (let k = 0; k < 12; k++) { const b = bounds(); if (b.x0 >= pad && b.x1 <= W - pad && b.y0 >= top && b.y1 <= H - bottom) break; dist *= 1.03; }
+  return dist;
 }
 
 let fly = null;
@@ -826,6 +854,20 @@ function placeLabels() {
   }
   // 由前（畫面下方）往後排，放不下全名時先拉高，再不行就只顯示編號
   placed.length = 0;
+  // 年級地名牌先排在原位（錨點在畫面內時不超出左右邊界），台地編號再避開它
+  for (const g of gradeLabels) {
+    project(g.pos, tmp);
+    const w = g.el.offsetWidth || 90, h = g.el.offsetHeight || 46, W = innerWidth;
+    const clampX = (dx) => (tmp.x > 0 && tmp.x < W ? Math.max(10 + w / 2 - tmp.x, Math.min(W - 10 - w / 2 - tmp.x, dx)) : dx);
+    let best = [clampX(0), 0, null];
+    search: for (const dy of [0, 24, -24]) for (const dx0 of [0, -w * 0.3, w * 0.3]) {
+      const dx = clampX(dx0), r = { x: tmp.x + dx - w / 2, y: tmp.y + dy - h, w, h };
+      if (!overlaps(r)) { best = [dx, dy, r]; break search; }
+    }
+    if (tmp.vis) placed.push(best[2] || { x: tmp.x + best[0] - w / 2, y: tmp.y - h, w, h });
+    g.el.style.transform = `translate(${tmp.x + best[0]}px, ${tmp.y + best[1]}px) translate(-50%, -100%)`;
+    g.el.style.visibility = tmp.vis ? 'visible' : 'hidden';
+  }
   const order = ISLANDS.slice().sort((a, b) => b.sy - a.sy);
   for (const isl of order) {
     const el = isl.labelEl;
@@ -849,11 +891,6 @@ function placeLabels() {
     el.style.setProperty('--stem', stem + 'px');
     el.style.transform = `translate(${isl.sx}px, ${isl.sy - stem}px) translate(-50%, -100%)`;
     el.style.visibility = isl.vis ? 'visible' : 'hidden';
-  }
-  for (const g of gradeLabels) {
-    project(g.pos, tmp);
-    g.el.style.transform = `translate(${tmp.x}px, ${tmp.y}px) translate(-50%, -100%)`;
-    g.el.style.visibility = tmp.vis ? 'visible' : 'hidden';
   }
   // 細項標籤：互相重疊時往上錯開
   const ip = [];

@@ -14,6 +14,8 @@ ICON = {'1-1': '🌱', '1-2': '📋', '2-1': '🏘️', '2-2': '🎓', '2-3': '�
         '4-1': '📊', '4-2': '🤝', '5-1': '📜', '5-2': '🔍', '5-3': '🗂️', '6-1': '🏘️', '6-2': '🌾', '6-3': '💡'}
 # Notion 色票（文字色，較飽和，適合 3D）
 COLOR = {'blue': '#337EA9', 'green': '#448361', 'purple': '#9065B0', 'orange': '#D9730D', 'yellow': '#CB912F', 'pink': '#C14C8A'}
+# 介面用色（白字底色）：橘、金加深到對比 4.5:1 以上；島嶼、旗幟、圖例仍用 COLOR
+UI_COLOR = {'orange': '#B45F0B', 'yellow': '#9A6E24'}
 TINT = {'blue': '#E7F3F8', 'green': '#EDF3EC', 'purple': '#F6F3F9', 'orange': '#FBECDD', 'yellow': '#FBF3DB', 'pink': '#FAF1F5'}
 
 def strip(s):
@@ -34,7 +36,7 @@ def photos_of(t):
 
 out = {'dims': []}
 for D in dims:
-    d = {'n': D['n'], 'icon': D['icon'], 'title': D['title'], 'weight': D['weight'], 'c': COLOR[D['color']], 'tint': TINT[D['color']],
+    d = {'n': D['n'], 'icon': D['icon'], 'title': D['title'], 'weight': D['weight'], 'c': COLOR[D['color']], 'ui': UI_COLOR.get(D['color'], COLOR[D['color']]), 'tint': TINT[D['color']],
          'desc': D['desc'], 'inds': []}
     for I in D['indicators']:
         code = I['code']
