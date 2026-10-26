@@ -399,6 +399,14 @@ figure.embed.local iframe { height: 520px; }
   details.tg .tb { padding: 2px 12px 4px; }
 }
 
+/* 極窄螢幕（約 360px）：標題縮一點、留給文字的寬度多一點，避免「鑑」單獨換行 */
+@media (max-width: 380px) {
+  .brand { padding: 10px 12px; gap: 8px; max-width: calc(100vw - 112px); /* 寬度不含左右內距，需扣掉；右邊留給選單按鈕 */ }
+  .brand .mark { width: 30px; height: 30px; }
+  .brand h1 { font-size: 20px; letter-spacing: .03em; text-wrap: balance; }
+  .brand > div { min-width: 0; }
+  .brand .school { font-size: 12px; letter-spacing: 0; }
+}
 /* 手機全景：構面名牌不顯示配分（圖例可查）；擠不下時暫時隱藏、不擋代碼 */
 @media (max-width: 759px) { body:not(.names) .dlabel .dw { display: none; } .dlabel { padding: 5px 10px; } }
 .dlabel.crowd { opacity: 0; pointer-events: none; }
