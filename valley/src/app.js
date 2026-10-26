@@ -744,8 +744,8 @@ function overview() {
 const _fitCam = new THREE.PerspectiveCamera();
 function fitLabels(target, dir, dist) {
   _fitCam.fov = camera.fov; _fitCam.aspect = innerWidth / innerHeight; _fitCam.near = camera.near; _fitCam.far = camera.far; _fitCam.updateProjectionMatrix();
-  const W = innerWidth, H = innerHeight, pad = 12, top = 136, bottom = 80;
-  const pts = ISLANDS.map((i) => [new THREE.Vector3(i.x, i.labelH, i.z), 22, 46]).concat(gradeSigns.map((g) => [g.pos, 55, 46]));
+  const W = innerWidth, H = innerHeight, pad = 16, top = 136, bottom = 80; // 左右多留空間，避免較寬字型或極窄螢幕切到代碼圓標
+  const pts = ISLANDS.map((i) => [new THREE.Vector3(i.x, i.labelH, i.z), 26, 46]).concat(gradeSigns.map((g) => [g.pos, 55, 46]));
   const bounds = () => {
     _fitCam.position.copy(target).addScaledVector(dir, dist); _fitCam.lookAt(target); _fitCam.updateMatrixWorld();
     const b = { x0: 1e9, x1: -1e9, y0: 1e9, y1: -1e9 };
