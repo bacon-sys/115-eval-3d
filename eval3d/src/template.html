@@ -101,6 +101,9 @@ body.focused .slabel, body.focused .vlabel { opacity: .0; pointer-events: none; 
 .pbtn:hover { background: var(--paper-2); }
 .pbtn:disabled { opacity: .4; cursor: default; }
 #close, #listClose { width: 44px; padding: 0; font-size: 22px; line-height: 1; }
+.pico { width: 44px; padding: 0; display: grid; place-items: center; color: var(--ink-soft); }
+.pico svg { width: 20px; height: 20px; }
+@media (max-width: 759px) { .pico { display: none; } }
 #panelBody, #listBody { overflow-y: auto; overscroll-behavior: contain; }
 #panelBody { padding: 10px 26px 30px; }
 .eyebrow { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
@@ -503,6 +506,12 @@ body.reading #wtags, body.valley #wtags, body.reading #viewPanel, body.valley #v
 .tcount { font-size: 14px; letter-spacing: .16em; color: var(--red); font-weight: 700; }
 .tcard h2 { font-family: var(--f-display); font-weight: 400; font-size: 30px; line-height: 1.3; margin: 6px 0 8px; text-wrap: balance; }
 .tcard p { margin: 0; font-size: 18px; color: var(--ink-soft); }
+.tread { display: flex; align-items: center; gap: 14px; width: 100%; margin-top: 16px; padding: 12px 16px; text-align: left; background: var(--paper-2); border: 1px solid var(--line); border-left: 5px solid var(--red); border-radius: 12px; color: var(--ink); font-size: 18px; line-height: 1.45; }
+.tread:hover { background: #efe6d6; }
+.tread svg { width: 26px; height: 26px; flex: none; color: var(--red); }
+.tread span:not(.go) { flex: 1; display: flex; flex-direction: column; }
+.tread small { font-size: 15px; color: var(--ink-soft); margin-top: 2px; }
+.tread .go { font-size: 20px; color: var(--ink-soft); }
 .tfoot { display: flex; align-items: center; gap: 10px; margin-top: 20px; }
 .tfoot .sp { flex: 1; }
 .tfoot button { white-space: nowrap; flex: none; }
@@ -730,6 +739,8 @@ body.playing .tools, body.playing #legend, body.playing #hint, body.playing #rou
     <button class="pbtn" id="prev" type="button">← 上一項</button>
     <button class="pbtn" id="next" type="button">下一項 →</button>
     <span class="sp"></span>
+    <button class="pbtn pico" id="pSearch" type="button" aria-label="搜尋全文" title="搜尋全文"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5.5 5.5"/></svg></button>
+    <button class="pbtn pico" id="pList" type="button" aria-label="指標總覽" title="指標總覽"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2"/><circle cx="4.5" cy="12" r="1.2"/><circle cx="4.5" cy="18" r="1.2"/></svg></button>
     <button class="pbtn" id="close" type="button" aria-label="關閉說明">×</button>
   </div>
   <div id="panelBody"></div>
@@ -791,6 +802,10 @@ body.playing .tools, body.playing #legend, body.playing #hint, body.playing #rou
     <div class="tcount" id="tourCount">1 / 5</div>
     <h2 id="tourTitle"></h2>
     <p id="tourText"></p>
+    <button type="button" class="tread" id="tourRead" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h7a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4Z"/><path d="M20 5h-7a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h7Z"/></svg>
+      <span><b>直接閱讀學校首頁（全文閱讀）</b><small>學校簡介、導覽快速入口與 17 項指標架構，不需操作地圖</small></span><span class="go" aria-hidden="true">→</span>
+    </button>
     <div class="tfoot">
       <div class="tdots" id="tourDots"></div>
       <span class="sp"></span>

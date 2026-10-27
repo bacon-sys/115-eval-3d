@@ -1546,7 +1546,7 @@ hintLater(12000);
 
 // ───────────────────────── 開場導覽
 const TOUR = [
-  { t: '歡迎來到評鑑導覽島', p: '這是宜蘭縣立大同國中 115 學年度原住民族實驗教育評鑑的 3D 導覽。湖中央是學校，周圍六座構面島，再以吊橋連到 17 座指標平台。' },
+  { t: '歡迎來到評鑑導覽島', p: '這是宜蘭縣立大同國中 115 學年度原住民族實驗教育評鑑的 3D 導覽。湖中央是學校，周圍六座構面島，再以吊橋連到 17 座指標平台。要找特定指標，可直接用右上角的「指標總覽」或「搜尋」；想先讀文字，請點下方按鈕。' },
   { t: '旗幟顏色就是構面', p: '每座構面島插著一面旗，顏色對應評鑑構面，旗桿越高代表配分越高。下方的圖例列出六個構面與配分。', cls: 'tour-legend' },
   { t: '移動與縮放', p: '' },
   { t: '點平台，看指標內容', p: '點任何一座平台或它的代碼，右側會出現指標原文、本頁重點與精選照片；地圖上的弧線會連到內文中互相引用的相關指標。按「閱讀完整內容」可以讀全文、看影片和佐證資料夾。' },
@@ -1562,6 +1562,8 @@ function renderTour() {
   $('#tourText').textContent = (st.cls === 'tour-tools' && isNarrow() ? '手機版的工具都收在右上角的「選單」裡。' : '') + (st.p || (matchMedia('(pointer: coarse)').matches
     ? '單指拖曳旋轉視角、雙指拖曳移動地圖、雙指捏合縮放。' + (isNarrow() ? '點右上角「選單」裡的「回到全景」' : '點右上角的「回到全景」') + '可以隨時回到整體視角。'
     : '左鍵拖曳旋轉視角、右鍵拖曳移動地圖、滾輪縮放（會朝滑鼠所在位置拉近）。點右上角的「回到全景」可以隨時回到整體視角。'));
+  $('#tourRead').hidden = tourStep !== 0;
+  if (tourStep === 0 && isNarrow()) $('#tourText').textContent = st.p.replace('右上角的「指標總覽」', '右上角「選單」裡的「指標總覽」');
   $('#tourNext').textContent = tourStep === TOUR.length - 1 ? '開始探索' : '下一步 →';
   $('#tourDots').innerHTML = TOUR.map((_, i) => `<span class="${i === tourStep ? 'on' : ''}"></span>`).join('');
   document.body.classList.remove('tour-legend', 'tour-tools');
@@ -1580,6 +1582,7 @@ function endTour() {
 }
 $('#tourNext').addEventListener('click', () => { if (tourStep < TOUR.length - 1) { tourStep++; renderTour(); } else endTour(); });
 $('#tourSkip').addEventListener('click', endTour);
+$('#tourRead').addEventListener('click', () => { endTour(); location.hash = '#phome'; });
 $('#tourOpen').addEventListener('click', () => { closeHelp(); startTour(); });
 // 右上角「？」：操作方式小卡，可再開啟完整使用說明
 const helpPop = $('#helpPop');
@@ -1606,6 +1609,9 @@ const search = createSearch({ titleOf: reader.titleOf, colorOf: reader.colorOf, 
   else location.hash = '#p' + ref;
 } });
 $('#searchBtn').addEventListener('click', () => search.open());
+// 側欄上方的搜尋／總覽小鈕（側欄會蓋住右上工具列）
+$('#pSearch').addEventListener('click', () => search.open());
+$('#pList').addEventListener('click', () => { history.replaceState(null, '', location.pathname + location.search); openList(); });
 $('#rdSearch').addEventListener('click', () => search.open());
 $('#textBtn').addEventListener('click', () => { location.hash = '#phome'; });
 function backToMap(ref) {
