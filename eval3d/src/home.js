@@ -67,18 +67,19 @@ export const RELATIONS = [
   { a: '6-3', b: '4-1', why: '前次評鑑建議「經費做成表格統計」的回應', src: '6-3', sec: '（六）回應前次評鑑建議' },
 ];
 
-// 關聯行人：每一條 RELATIONS 由一位角色帶著佐證物品往返（a → b）
-// role 對應 roles.js 的角色造型；both：雙向都帶著物品
+// 關聯行人：每一條 RELATIONS 由一位角色在 a、b 之間往返。a 是寫下「另見指標 b」的出處頁，佐證放在 b，
+// 所以島民在 b 拿起佐證、送到 a（b → a 這段帶著物品），再空手走回 b。role 對應 roles.js 的角色造型；both：雙向都帶著物品
+// item 用 Notion 原文的用語
 export const WALKERS = [
-  { a: '2-2', b: '6-1', role: 'teacher', item: '招生摺頁', prop: 'brochure', icon: '📄' },
+  { a: '2-2', b: '6-1', role: 'teacher', item: '招生宣導資料', prop: 'brochure', icon: '📄' },
   { a: '2-2', b: '6-3', role: 'teacher', item: '問卷（98 份）', prop: 'stack', icon: '📋' },
   { a: '2-2', b: '3-4', role: 'alumni', item: '織布作品', prop: 'textile', icon: '🧶' },
   { a: '3-3', b: '3-4', role: 'student', item: '回饋問卷', prop: 'sheets', icon: '📝', both: true },
-  { a: '3-4', b: '3-2', role: 'student', item: '獎狀', prop: 'award', icon: '🏆' },
+  { a: '3-4', b: '3-2', role: 'student', item: '族語競賽成績', prop: 'award', icon: '🏆' },
   { a: '6-3', b: '1-1', role: 'advisor', item: '會議資料', prop: 'binder', icon: '📁' },
   { a: '6-3', b: '3-1', role: 'culture', item: '教案', prop: 'book', icon: '📘' },
   { a: '6-3', b: '3-3', role: 'student', item: '學習紀錄本', prop: 'notebook', icon: '📒' },
   { a: '6-3', b: '3-4', role: 'leader', item: '觀察紀錄', prop: 'clipboard', icon: '🗒️' },
-  { a: '6-3', b: '2-3', role: 'culture', item: '研習手冊', prop: 'booklet', icon: '📗' },
+  { a: '6-3', b: '2-3', role: 'culture', item: '增能研習紀錄', prop: 'booklet', icon: '📗' },
   { a: '6-3', b: '4-1', role: 'staff', item: '經費統計表', prop: 'chart', icon: '📊' },
 ];

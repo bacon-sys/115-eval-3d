@@ -559,7 +559,7 @@ function routeBetween(A, B) {
 WALKERS.forEach((cfg, i) => {
   const A = byCode(cfg.a), B = byCode(cfg.b);
   const rel = RELATIONS.find((r) => r.a === cfg.a && r.b === cfg.b);
-  const wk = makeRoleWalker(cfg.role, { prop: cfg.prop, icon: cfg.icon, ring: B.dim.c });
+  const wk = makeRoleWalker(cfg.role, { prop: cfg.prop, icon: cfg.icon, ring: A.dim.c });
   wk.g.scale.setScalar(1.5);
   scene.add(wk.g);
   const leg = routeBetween(A, B);
@@ -567,7 +567,7 @@ WALKERS.forEach((cfg, i) => {
     lat: ((i % 5) - 2) * 0.075, vmax: 0.95 + hash(i, 3) * 0.3, vis: 1 });
   // 起點分散：有的在路上、有的剛出發
   w.s = leg.len * hash(i, 11) * 0.9; w.dir = hash(i, 13) > 0.35 ? 1 : -1;
-  w.setCarry(w.dir > 0 || !!cfg.both);
+  w.setCarry(w.dir < 0 || !!cfg.both); // 佐證放在 b：往 a 走的這段帶著物品
   addWalkerHit(w);
   walkers.push(w);
 });
@@ -600,8 +600,8 @@ function walkerRelevant(w) {
 function arrive(w) {
   if (w.kind === 'guide') { w.pause = 4.5; w.look = 0; return; }
   w.pause = 2; w.look = 0;
-  // 送達：到 B 交出物品；回到 A 再拿起下一份（雙向往返的回饋問卷一直帶著）
-  if (!w.cfg.both) w.setCarry(w.dir < 0);
+  // 到 B 拿起佐證、送回 A 交出（A 頁引用 B 的佐證）；雙向往返的回饋問卷一直帶著
+  if (!w.cfg.both) w.setCarry(w.dir > 0);
 }
 function updateWalker(w, dt, t) {
   if (opts.icons) fadeIcon(w, camera, 30, 46); else if (w.icon) w.icon.visible = false;
@@ -644,7 +644,7 @@ function updateWalker(w, dt, t) {
   poseWalker(w, w.phase, 0.55);
   if ((w.dir > 0 && w.s >= L) || (w.dir < 0 && w.s <= 0)) arrive(w);
 }
-if (/[?&]debug\b/.test(location.search)) window.__e3d = { walkers, scene, school, DIMS, camera, controls, flyTo: (...a) => flyTo(...a), THREE: { Vector3: THREE.Vector3, Box3: THREE.Box3 }, CP, advance: (sec) => { for (let i = 0; i < sec * 20; i++) for (const w of walkers) updateWalker(w, 0.05, i * 0.05); } };
+if (/[?&]debug\b/.test(location.search)) window.__e3d = { talk: (i) => talkTo(walkers[i]), walkers, scene, school, DIMS, camera, controls, flyTo: (...a) => flyTo(...a), THREE: { Vector3: THREE.Vector3, Box3: THREE.Box3 }, CP, advance: (sec) => { for (let i = 0; i < sec * 20; i++) for (const w of walkers) updateWalker(w, 0.05, i * 0.05); } };
 // 行人頭上的小名牌：小嚮導一直顯示所在指標；關聯行人在開啟相關指標或滑鼠移過時顯示
 const wtagLayer = document.createElement('div'); wtagLayer.id = 'wtags'; { const lab = document.getElementById('labels'); if (lab) lab.before(wtagLayer); else document.body.appendChild(wtagLayer); } // 放在指標標籤底下
 for (const w of walkers) { w.tag = document.createElement('div'); w.tag.className = 'wtag' + (w.kind === 'guide' ? ' guide' : ''); wtagLayer.appendChild(w.tag); w.tagText = ''; }
@@ -1068,10 +1068,10 @@ let listTab = 'ind';
 function relationRows() {
   return RELATIONS.map((r, k) => {
     const A = byCode(r.a), B = byCode(r.b), w = walkers.find((x) => x.rel === r);
-    const who = w ? `${w.cfg.icon} ${w.roleName}帶著「${esc(w.cfg.item)}」` : '';
+    const who = w ? `${w.cfg.icon} ${w.roleName}把「${esc(w.cfg.item)}」${w.cfg.both ? `在 ${r.a}、${r.b} 之間來回帶著` : `從 ${r.b} 送到 ${r.a}`}` : '';
     return `<div class="relrow${relFocus === k ? ' on' : ''}" data-k="${k}" style="--ca:${A.dim.ui};--cb:${B.dim.ui}">
       <button type="button" class="relmain" data-rel="${k}" aria-label="在地圖上看 ${r.a} 與 ${r.b} 的關聯">
-        <span class="rpair"><b class="ra">${r.a}</b><i aria-hidden="true">→</i><b class="rb">${r.b}</b><span class="rnames">${esc(A.short)} → ${esc(B.short)}</span></span>
+        <span class="rpair"><b class="ra">${r.a}</b><i aria-hidden="true">⇄</i><b class="rb">${r.b}</b><span class="rnames">${esc(A.short)} ⇄ ${esc(B.short)}</span></span>
         <span class="rwhy">${esc(r.why)}</span>
         ${who ? `<span class="rwho">${who}</span>` : ''}
       </button>
@@ -1246,11 +1246,10 @@ function talkTo(w) {
   } else {
     const { cfg, rel, A, B } = w;
     const why = rel ? rel.why : '';
+    const from = w.dir > 0 ? A : B, dest = w.dir > 0 ? B : A;
     text = w.carrying
-      ? (cfg.both && w.dir < 0
-        ? `我是${w.roleName}，正把「${cfg.item}」從 ${B.code} 帶回 ${A.code}：${why}。`
-        : `我是${w.roleName}，正把「${cfg.item}」從 ${w.dir > 0 ? A.code : B.code} 送到 ${w.dir > 0 ? B.code : A.code}：${why}。`)
-      : `我是${w.roleName}，剛把「${cfg.item}」送到 ${B.code}，正要回 ${A.code}。這兩項指標的關聯是：${why}。`;
+      ? `我是${w.roleName}，正把「${cfg.item}」從 ${from.code} 送到 ${dest.code}：${why}。`
+      : `我是${w.roleName}，剛把「${cfg.item}」送到 ${A.code}，正要回 ${B.code} 拿下一份。這兩項指標的關聯是：${why}。`;
     const to = w.dir > 0 ? B : A;
     acts = [{ t: `去 ${to.code}`, a: { ind: to.code } }];
     if (rel) acts.push({ t: `讀出處（${rel.src}）`, a: { read: rel.src, sec: rel.sec }, more: true });
@@ -1322,7 +1321,7 @@ function buildPlay() {
     ...DIMS.map((d) => ({ kick: `構面${NUM[d.n]}・配分 ${d.weight}`, t: dimName(d), p: d.desc, cam: dimShot(d), color: d.ui })),
     { kick: '6-3 學校辦理民族教育之創新與省思', t: '亮點與創新', p: hl.text, cam: { target: i63.pos.clone().setY(i63.top + 0.9), dist: 16, dir: new THREE.Vector3(0.5, 0.7, 0.5) }, rel: '6-3', color: i63.dim.c },
     { kick: '評鑑查核', t: '前次評鑑建議的回應', p: prev.text, cam: { target: i63.pos.clone().setY(i63.top + 0.9), dist: 13, dir: new THREE.Vector3(-0.55, 0.62, 0.55) }, color: '#448361' },
-    { kick: '相關指標', t: '島民帶著佐證，在相關指標之間往返', p: `吊橋上的島民依網站內文互相引用的 ${RELATIONS.length} 組指標，帶著招生摺頁、問卷、教案、會議資料、經費統計表等佐證來回走動；穿黃衣的小嚮導則從 1-1 依序走到 6-3。`, cam: { target: new THREE.Vector3(0, 1, 0), dist: 48, dir: new THREE.Vector3(0.3, 0.8, 0.52) } },
+    { kick: '相關指標', t: '島民帶著佐證，在相關指標之間往返', p: `吊橋上的島民依網站內文互相引用的 ${RELATIONS.length} 組指標，帶著招生宣導資料、問卷、教案、會議資料、經費統計表等佐證來回走動；穿黃衣的小嚮導則從 1-1 依序走到 6-3。`, cam: { target: new THREE.Vector3(0, 1, 0), dist: 48, dir: new THREE.Vector3(0.3, 0.8, 0.52) } },
     { kick: '開始瀏覽', t: '點平台，看指標內容', p: '點任何一座平台或它的代碼，可以看到指標原文、本頁重點與精選照片；按「閱讀完整內容」可閱讀全文、觀看影片與佐證資料夾。操作方式可點右上角的「？」（使用說明）查看。', cam: 'overview' },
   ];
   shots.forEach((s) => { s.dur = Math.min(12, Math.max(6, 2.5 + s.p.length * 0.075)); }); // 慢速：約每秒 13 字的瀏覽速度，每段 6～12 秒
