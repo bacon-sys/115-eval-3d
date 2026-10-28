@@ -7,7 +7,7 @@
 | 項目 | 位置 |
 | --- | --- |
 | 正式網站（3D 導覽） | https://bacon-sys.github.io/115-eval-3d/ |
-| 三年山徑（課程地圖） | https://bacon-sys.github.io/115-eval-3d/valley/ |
+| 三年山徑（課程地圖，正式版） | https://bacon-sys.github.io/datong-trail/（repo `bacon-sys/datong-trail`：網頁本體＋`img/` 課程現場照片＋`pdf/` 21 單元教案 PDF）。舊網址 `115-eval-3d/valley/` 只是轉址頁 |
 | GitHub repo | `bacon-sys/115-eval-3d`：`main` 分支＝發布的成品（GitHub Pages 自動部署）；`source` 分支＝原始碼（本文件所在） |
 | Artifact（主網站） | https://claude.ai/artifact/LUHtbGefRBF7LRTDfET584 |
 | Artifact（三年山徑） | https://claude.ai/artifact/6tfYWwanfhHQ5xnsnm8gEK |
@@ -29,10 +29,10 @@ cd /home/claude/src/eval3d && npm install
 ## 三、建置、測試、發布
 
 1. 三年山徑：`cd valley && python3 build.py` → `valley/dist/`
-2. 主網站：`cd eval3d && python3 build.py`（會跑 extract.py、render.py，並把 valley 成品複製到 `site/valley/`）→ `eval3d/site/index.html`、`eval3d/dist/index.html`（artifact 用片段）
+2. 主網站：`cd eval3d && python3 build.py`（會跑 extract.py、render.py；`site/valley/index.html` 寫入轉址頁 `valley_redirect.html`，完整山徑只放 `dist/valley/` 給 artifact 用）→ `eval3d/site/index.html`、`eval3d/dist/index.html`（artifact 用片段）
 3. 測試：`cd eval3d/site && (python3 -m http.server 8765 >/dev/null 2>&1 &)`，Playwright 加 `--use-angle=swiftshader --enable-unsafe-swiftshader`（舊的 `--use-gl=swiftshader` 會讓下方操作提示畫不出來，屬測試環境問題；山徑較重，必要時再用 `--use-gl`）；網址加 `?debug` 會開放 `window.__e3d`（主網站）、`window.__vl`（山徑），可用 `advance(秒)` 快轉島民。範例在 `eval3d/test/`。圖片在 main 分支的 `img/`，本機測試看不到照片屬正常。
-4. 發布：把 `eval3d/site/index.html` 複製到 main 的 `index.html`、`eval3d/site/valley/index.html` 複製到 main 的 `valley/index.html`，commit、push。
-5. 重新發布 artifact：主網站用 Artifact publish `file_path=eval3d/dist/index.html`、`url`＝主網站 artifact、`root=eval3d/site`、`files=[{"path":"valley/index.html"}]`；山徑用 `valley/dist/valley.html` 發到山徑 artifact（跨對話需先 `action: read` 該 artifact）。
+4. 發布：把 `eval3d/site/index.html` 複製到 main 的 `index.html`、`eval3d/site/valley/index.html`（轉址頁）複製到 main 的 `valley/index.html`，commit、push。**絕不可把完整山徑蓋回 main 的 `valley/`**：主網站在 github.io 上以 `TRAIL_URL` 開 datong-trail，教案下載只在那裡。
+5. 重新發布 artifact：主網站用 Artifact publish `file_path=eval3d/dist/index.html`、`url`＝主網站 artifact、`root=eval3d/dist`、`files=[{"path":"valley/index.html"}]`（artifact 內附完整山徑，但沒有教案 PDF 與照片）；山徑用 `valley/dist/valley.html` 發到山徑 artifact（跨對話需先 `action: read` 該 artifact）。
 6. 原始碼有改，也要 commit、push 到 `source` 分支。
 7. commit 訊息結尾加上系統提示的兩行署名。
 
@@ -68,6 +68,8 @@ cd /home/claude/src/eval3d && npm install
 - 網站用語：走動的人物一律稱「島民」（原稱「小人」），小嚮導不變
 - 效能：靜止 30fps、關動畫 8fps，依實測降解析度與關陰影
 - 三年山徑：一位學生依序走 01→21（換年級換服色，走完新一屆接手）、9 位銜接行人；找小嚮導遊戲維持原樣
+
+- **三年山徑與 datong-trail**：2026-10-26 山徑搬到獨立 repo `datong-trail`，教案 PDF（`__lp` 資料與「教案下載」區塊）與課程現場照片是直接加在 datong-trail 的 `index.html`，**不在本 repo 的 `valley/src`**。若改了 `valley/src` 要更新 datong-trail，須保留那兩段注入內容（先比對 datong-trail 現行 `index.html`），不可直接覆蓋。2026-10-27 曾因從 source 重建而把 main 蓋回舊山徑、教案看不到，10-28 已修正（`eval3d/test/t_trail.js` 可檢查）。
 
 ## 六、老師的工作原則（務必遵守）
 

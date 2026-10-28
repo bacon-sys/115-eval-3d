@@ -14,7 +14,9 @@ const $ = (s, el = document) => el.querySelector(s);
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isNarrow = () => innerWidth < 760;
 const NUM = ['', '一', '二', '三', '四', '五', '六'];
-const VALLEY_URL = 'valley/';
+// 三年山徑正式版在獨立網站 datong-trail（含各單元教案 PDF 與課程現場照片）；artifact 與本機測試才用內附的 valley/
+const TRAIL_URL = 'https://bacon-sys.github.io/datong-trail/';
+const VALLEY_URL = /github\.io$/.test(location.hostname) ? TRAIL_URL : 'valley/';
 
 function hash(x, y) { const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return s - Math.floor(s); }
 function vnoise(x, y) {

@@ -11,7 +11,10 @@ out = pathlib.Path('dist'); out.mkdir(exist_ok=True)
 full = '<!doctype html>\n<html lang="zh-Hant">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n</head>\n<body>\n' + html + '\n</body>\n</html>\n'
 pathlib.Path('site').mkdir(exist_ok=True)
 pathlib.Path('site/index.html').write_text(full)  # GitHub Pages 用（完整文件）
-# 三年山徑一併放進網站
+# 三年山徑：正式版已搬到 bacon-sys/datong-trail（含教案 PDF、課程現場照片）。
+# GitHub Pages 的舊網址 valley/ 只放轉址頁；完整山徑只給 artifact 用（dist/valley/）。
 v = pathlib.Path('site/valley'); v.mkdir(exist_ok=True)
-shutil.copy('../valley/dist/三年山徑_大同國中泰雅文化課程.html', v/'index.html')
+(v/'index.html').write_text(pathlib.Path('valley_redirect.html').read_text())
+dv = out/'valley'; dv.mkdir(exist_ok=True)
+shutil.copy('../valley/dist/三年山徑_大同國中泰雅文化課程.html', dv/'index.html')
 print(len(html)//1024, 'KB')
