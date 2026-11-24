@@ -1,0 +1,318 @@
+:root{
+  --paper:#F6F2EA; --ink:#3B3936; --sub:#7A746B; --faint:#A8A196; --line:#DCD4C6; --line2:#E8E1D4;
+  --sage:#7F9A7C; --sage-t:#E5EBE0; --terra:#BE8466; --terra-t:#F1E3D8;
+  --mist:#7893AA; --mist-t:#E0E7EE; --plum:#958AA8; --plum-t:#E7E3EE;
+  --neu:#9C958A; --neu-t:#EAE5DC; --mark:#A9654C;
+  --sans:"BkSans","Noto Sans CJK TC","Noto Sans TC",sans-serif; --serif:"BkSerif","Noto Serif CJK TC","Noto Serif TC",serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#888}
+body{font-family:var(--sans);color:var(--ink);font-size:9.5pt;line-height:1.7;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:calc(182mm + 2*var(--b));height:calc(257mm + 2*var(--b));position:relative;overflow:hidden;background:var(--paper);break-after:page}
+.trim{position:absolute;left:var(--b);top:var(--b);width:182mm;height:257mm}
+.m{position:absolute;top:15mm;bottom:17mm;display:flex;flex-direction:column}
+.page.r .m{left:19mm;right:17mm}
+.page.l .m{left:17mm;right:19mm}
+.dm{width:9mm;height:3.6mm;color:var(--mark);flex:none}
+
+/* 頁尾 */
+.ft{position:absolute;bottom:8mm;font-size:7pt;color:var(--faint);display:flex;gap:4mm;align-items:baseline;letter-spacing:.02em}
+.ft.r{right:17mm;flex-direction:row-reverse}
+.ft.l{left:17mm}
+.ft .pn{font-size:9pt;color:var(--sub);font-weight:700}
+
+/* 構面側邊索引 */
+.tabs{position:absolute;top:0;bottom:0;width:0}
+.tabs.r{right:calc(-1*var(--b))}
+.tabs.l{left:calc(-1*var(--b))}
+.tab{position:absolute;width:calc(7mm + var(--b));height:22mm;background:#EDE7DB;color:var(--faint);display:flex;align-items:center;font-size:8.5pt;font-weight:500}
+.tabs.r .tab{right:0;border-radius:2mm 0 0 2mm;justify-content:flex-start;padding-left:2.1mm}
+.tabs.l .tab{left:0;border-radius:0 2mm 2mm 0;justify-content:flex-end;padding-right:2.1mm}
+.tab.on{background:#6F675C;color:var(--paper)}
+
+.lab{font-size:7.8pt;letter-spacing:.12em;color:var(--sub);font-weight:700}
+.kick{display:flex;align-items:center;gap:2.5mm;font-size:8pt;color:var(--sub);letter-spacing:.06em}
+
+/* ── 封面（內縮照片） ── */
+.cover .m{left:17mm!important;right:17mm!important;top:16mm;bottom:15mm}
+.cv-top{display:flex;justify-content:space-between;align-items:center;font-size:9pt;letter-spacing:.3em;color:var(--sub);font-weight:700}
+.cv-ph{margin-top:6mm;height:111mm;overflow:hidden;border-radius:1mm}
+.cv-ph img{width:100%;height:100%;object-fit:cover;object-position:50% 55%;filter:saturate(.9)}
+.cv-q{margin-top:12mm;font-family:var(--serif);font-weight:700;font-size:24.5pt;line-height:1.55;letter-spacing:.03em;color:var(--ink)}
+.cv-by{margin-top:4mm;font-size:9.5pt;color:var(--sub);letter-spacing:.06em;text-align:right}
+.cv-bot{margin-top:auto;border-top:.3mm solid var(--line);padding-top:5mm;display:flex;justify-content:space-between;align-items:flex-end}
+.cv-t1{font-size:10pt;letter-spacing:.06em;color:var(--sub)}
+.cv-t2{font-size:17pt;font-weight:700;letter-spacing:.12em;margin-top:1mm}
+.cv-rt{text-align:right}
+.cv-book{display:flex;align-items:center;gap:2.5mm;justify-content:flex-end;font-size:13pt;font-weight:700;letter-spacing:.2em}
+.cv-date{margin-top:1.5mm;font-size:10.5pt;letter-spacing:.16em;color:var(--sub);font-weight:500}
+
+/* ── 跨頁共用 ── */
+.sh h1{font-size:17pt;font-weight:700;letter-spacing:.06em;margin-top:2mm}
+.sh .lead{margin-top:2.5mm;font-size:8.8pt;color:var(--sub);line-height:1.7}
+.sh-r{padding-top:0}
+.chip{display:inline-flex;align-items:baseline;gap:.9mm;border:.25mm solid var(--line);border-radius:.8mm;padding:0 1.3mm;margin:0 .8mm .6mm 0;background:#FBF9F5;font-size:7.8pt;line-height:1.55;white-space:nowrap}
+.chip b{font-weight:700}
+.chip i{font-style:normal;font-size:6.6pt;color:var(--sub)}
+.legend{margin:3.5mm 0 3mm;font-size:7.5pt;color:var(--sub);display:flex;align-items:center;gap:1.5mm}
+.legend .chip{margin:0}
+
+.ch{margin-bottom:1.9mm}
+.ch-h{display:flex;align-items:baseline;gap:2.5mm;padding:.8mm 0 .8mm 2.5mm;border-left:1.1mm solid var(--c);background:var(--t)}
+.ch-n{font-weight:700;font-size:9.5pt;letter-spacing:.08em}
+.ch-t{font-size:7.8pt;color:var(--sub);font-style:italic}
+.ch-r{margin-left:auto;padding-right:2.5mm;font-size:7.5pt;color:var(--sub)}
+.ch ul{list-style:none}
+.ch li{display:grid;grid-template-columns:8mm 1fr auto;column-gap:2mm;align-items:baseline;padding:.62mm 0 .3mm 2.5mm;border-bottom:.2mm solid var(--line2);font-size:8.6pt;line-height:1.5}
+.ch li .sp{color:var(--c);font-weight:500;font-size:8pt}
+.ch li .cs{text-align:right;max-width:46mm}
+.ch li.cvp .st{color:var(--faint);font-size:7.8pt}
+.sage{--c:var(--sage);--t:var(--sage-t)} .terra{--c:var(--terra);--t:var(--terra-t)}
+.mist{--c:var(--mist);--t:var(--mist-t)} .plum{--c:var(--plum);--t:var(--plum-t)}
+.neu{--c:var(--neu);--t:var(--neu-t)}
+
+/* 右頁矩陣 */
+.mx{width:100%;border-collapse:collapse;margin-top:4mm;font-size:8pt;table-layout:fixed}
+.mx th{font-weight:700;padding:1.4mm .5mm 1.2mm;border-bottom:.35mm solid var(--c,var(--ink));vertical-align:bottom;text-align:center;line-height:1.3}
+.mx th .cn{display:block;font-size:8.3pt;color:var(--ink)}
+.mx th .cr{display:block;font-size:6.6pt;color:var(--sub);font-weight:400}
+.mx th.ich{width:44mm;text-align:left;border-color:var(--ink);font-size:8.3pt}
+.mx th.mph{width:11mm;border-color:var(--ink);font-size:7.5pt}
+.mx td{padding:.95mm .5mm;border-bottom:.2mm solid var(--line2);text-align:center;vertical-align:middle;line-height:1.35}
+.mx td.ic{text-align:left;padding-left:0}
+.mx td.ic b{font-weight:700;margin-right:1.6mm;font-size:8.3pt}
+.mx td.ic span{font-size:7.6pt;color:var(--ink)}
+.mx td.mp{font-weight:700;color:var(--ink);font-size:8.5pt}
+.mx td.mp::after{content:"頁";font-size:6.5pt;color:var(--sub);margin-left:.3mm;font-weight:400}
+.mx .pp{display:inline-block;margin:.25mm .3mm;padding:0 .9mm;border-radius:.7mm;background:var(--t);color:var(--ink);font-size:7.2pt;line-height:1.55}
+.mx tr.dimrow td{text-align:left;padding:2.2mm 0 .8mm;border-bottom:.3mm solid var(--line);font-size:8pt;font-weight:700;color:var(--ink)}
+.mx tr.dimrow .dn{color:var(--mark);margin-right:2mm;letter-spacing:.08em}
+.mx tr.dimrow .dw{float:right;color:var(--sub);font-weight:400;font-size:7.4pt}
+.mx-note{margin-top:3mm;font-size:7.3pt;color:var(--sub)}
+
+/* ── 指標頁 ── */
+.ih h1{display:flex;align-items:baseline;gap:3.5mm;font-size:15.5pt;font-weight:700;letter-spacing:.04em;margin-top:1.5mm;line-height:1.35}
+.ih .code{font-size:22pt;font-weight:700;color:var(--mark);letter-spacing:0}
+.ih .w{margin-left:auto;font-size:7.8pt;border:.25mm solid var(--line);border-radius:.8mm;padding:0 1.6mm}
+.quote{margin-top:4mm;padding:2.6mm 4mm;background:#EFEAE0;border-radius:1mm;display:flex;gap:4mm;align-items:baseline}
+.quote p{font-family:var(--serif);font-size:10.5pt;line-height:1.6}
+.quote .lab{flex:none}
+.slides{margin-top:3mm;display:flex;align-items:center;gap:2mm;flex-wrap:wrap}
+.slides .lab{margin-right:2mm}
+.tr{display:inline-flex;gap:1.6mm;align-items:baseline;padding:.3mm 2mm;border-radius:.8mm;background:var(--t);font-size:8.3pt}
+.tr b{font-weight:700;color:var(--c);filter:brightness(.82)}
+.sum{margin-top:4mm}
+.sum dl{margin-top:1.4mm;border-top:.25mm solid var(--line)}
+.sum dl div{display:grid;grid-template-columns:25mm 1fr;gap:3mm;padding:1.25mm 0;border-bottom:.2mm solid var(--line2)}
+.sum dt{font-weight:700;font-size:8.8pt;line-height:1.6}
+.sum dd{font-size:8.8pt;line-height:1.6}
+.pts{margin-top:4mm}
+.row2{margin-top:4mm;display:grid;grid-template-columns:52mm 1fr;gap:7mm;align-items:stretch}
+.row2.nophoto{grid-template-columns:1fr}
+.row2.nophoto .nums{display:grid;grid-template-columns:1fr 1fr;gap:3.5mm 7mm}
+.row2.nophoto .nums .lab{grid-column:1/-1}
+.lc{display:flex;flex-direction:column}
+.k{font-weight:700}
+.drv b{font-weight:700}
+.pts ol{margin-top:1.6mm;list-style:none;counter-reset:p}
+.pts li{counter-increment:p;position:relative;padding:1.05mm 0 1.05mm 6.5mm;border-bottom:.2mm solid var(--line2);font-size:9.3pt;line-height:1.55}
+.pts li::before{content:counter(p);position:absolute;left:0;top:1.3mm;font-size:7.5pt;color:var(--mark);font-weight:500}
+.nums{display:flex;flex-direction:column;gap:2.8mm}
+.nums .lab{margin-bottom:-1.5mm}
+.num{border-top:.35mm solid var(--ink);padding-top:1.6mm}
+.nb{font-size:23pt;font-weight:700;line-height:1.1;letter-spacing:-.01em}
+.nb small{font-size:10pt;margin-left:.6mm;font-weight:700}
+.nl{font-size:8.8pt;font-weight:700;margin-top:.8mm;line-height:1.45}
+.nn{font-size:7.5pt;color:var(--sub);line-height:1.5;margin-top:.5mm}
+.ns{font-size:6.8pt;color:var(--faint);margin-top:.6mm}
+.ph{display:flex;flex-direction:column;padding-top:5.2mm}
+.ph img{width:100%;height:0;flex:1 1 auto;min-height:36mm;object-fit:cover;border-radius:.8mm;display:block}
+.ph figcaption{font-size:7.6pt;color:var(--sub);line-height:1.6;margin-top:1.5mm}
+.go{margin-top:4mm;border-top:.3mm solid var(--line);padding-top:2mm}
+.go-g{display:grid;grid-template-columns:1fr 1fr;gap:6mm;margin-top:1.2mm}
+.gl{font-size:7.3pt;color:var(--sub);margin-top:1mm}
+.url{font-family:var(--sans);font-size:7.6pt;letter-spacing:.01em;word-break:break-all;color:var(--ink)}
+.url.big{font-size:8.6pt;font-weight:700}
+.drv{font-size:8.2pt}
+.tbd{color:var(--mark)}
+.go-i{list-style:none}
+.go-i li{padding:.3mm 0;line-height:1.35}
+.go-i .il{display:block;font-size:7.8pt;font-weight:700}
+.go-i .url{display:block;font-size:7pt;color:var(--sub)}
+.notes{margin-top:4mm;flex:1;display:flex;flex-direction:column;min-height:26mm}
+.notes .lines{flex:1;min-height:0;overflow:hidden;margin-top:1mm;border-top:.3mm solid var(--line);display:flex;flex-direction:column}
+.notes .lines i{display:block;flex:none;height:7.8mm;border-bottom:.25mm solid var(--line)}
+.notes.full{margin-top:6mm}
+.notes.full .lines i{height:8.6mm}
+/* ── 封底 ── */
+.back .m{justify-content:center}
+.bc-h{margin-top:auto;text-align:center;font-size:12pt;font-weight:700;letter-spacing:.1em;padding-bottom:9mm}
+.bc-mid{margin-top:0!important}
+.bc-mid{display:flex;align-items:center;gap:11mm;margin:0 0 auto;padding:0 4mm}
+.bc-qr{text-align:center;flex:none}
+.bc-qr img{width:38mm;height:38mm;display:block;padding:3mm;background:#fff;border-radius:1mm}
+.bc-qr p{margin-top:2mm;font-size:8.5pt;font-weight:700;letter-spacing:.1em;color:var(--sub)}
+.bc-links{list-style:none;flex:1}
+.bc-links li{padding:2.4mm 0;border-bottom:.2mm solid var(--line2)}
+.bc-links .bl{display:block;font-size:9.5pt;font-weight:700}
+.bc-links .url{display:block;font-size:8.6pt;color:var(--sub)}
+.bc-bot{text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.5mm}
+.bc-s{font-size:11pt;font-weight:700;letter-spacing:.14em}
+.bc-t{font-size:8pt;color:var(--sub)}
+@media screen{.page{margin:6mm auto;box-shadow:0 1mm 4mm rgba(0,0,0,.25)}}
+@media print{html,body{background:none}}
+
+.legend .sub{font-size:9pt;font-weight:700;color:var(--ink);letter-spacing:.08em;margin-right:3mm;padding-left:2mm;border-left:.6mm solid var(--mark);line-height:1.2}
+.sh .lead2{margin-top:2mm;font-size:8.8pt;color:var(--sub);line-height:1.7;height:15mm;padding-top:7.5mm}
+.spread-r .mx{margin-top:0}
+.cv-q .ind{display:inline-block;padding-left:1em}
+
+.kick .pg-ref{margin-left:auto;font-size:7.5pt;border:.25mm solid var(--line);border-radius:.8mm;padding:0 1.6mm;letter-spacing:.02em}
+.nb.long{font-size:17pt}
+/* ── 第 2 頁 ── */
+.guide{margin-top:4mm;padding-left:5mm;font-size:9.2pt;line-height:1.7}
+.guide li{margin-bottom:1.2mm;padding-left:1mm}
+.guide li::marker{color:var(--mark);font-weight:700}
+.toc-lab{margin-top:7mm;padding-bottom:1.5mm;border-bottom:.35mm solid var(--ink)}
+.toc{list-style:none}
+.toc li{display:flex;align-items:baseline;gap:2mm;padding:1.25mm 0;font-size:9.4pt;font-weight:700}
+.toc .dots{flex:1;border-bottom:.3mm dotted var(--faint);transform:translateY(-1mm)}
+.toc .tp{font-weight:700;min-width:6mm;text-align:right}
+.toc-dims{display:grid;grid-template-columns:1fr 1fr;column-gap:8mm;margin:1mm 0 1.5mm;border-top:.2mm solid var(--line2);border-bottom:.2mm solid var(--line2);padding:1.5mm 0}
+.td ul{list-style:none;margin-bottom:1.5mm}
+.td li{display:flex;align-items:baseline;gap:1.5mm;padding:.45mm 0;font-size:8.3pt}
+.td li .dots{flex:1;border-bottom:.3mm dotted var(--line);transform:translateY(-1mm)}
+.td li.dim{font-weight:700;font-size:8.8pt;padding-top:1.2mm}
+.td li.dim .w{font-weight:400;font-size:7.3pt;color:var(--sub);margin-left:1.5mm}
+.td li.sub .tt{padding-left:3mm;color:var(--ink)}
+.td li.sub b{font-weight:700}
+.td .tp{min-width:5mm;text-align:right;font-weight:700}
+/* ── 第 3 頁 ── */
+.prof .sh h1{font-size:15.5pt}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:4mm;margin-top:5mm}
+.stats>div{border-top:.35mm solid var(--ink);padding-top:1.6mm}
+.sb{font-size:21pt;font-weight:700;line-height:1.15}
+.sb small{font-size:8.5pt;margin-left:.8mm}
+.sl{font-size:8pt;color:var(--sub);line-height:1.45;margin-top:.8mm}
+.vision{margin-top:6mm;padding:4mm 5mm 4.5mm;background:#EFEAE0;border-radius:1mm}
+.vt{font-family:var(--serif);font-weight:700;font-size:17pt}
+.vt span{font-family:var(--sans);font-size:9pt;font-weight:400;color:var(--sub);margin-left:1mm}
+.vd{font-size:8.8pt;color:var(--sub);margin-top:.5mm}
+.ptraits{display:grid;grid-template-columns:repeat(4,1fr);gap:2.5mm;margin-top:3mm}
+.pt{background:var(--t);border-top:1mm solid var(--c);padding:2.2mm 2.5mm;border-radius:0 0 .8mm .8mm}
+.pt b{display:block;font-size:12pt;font-weight:700}
+.pt i{font-size:7.8pt;color:var(--sub)}
+.mech-lab{margin-top:6mm}
+.mech{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm;margin-top:2mm}
+.mech>div{border-top:.25mm solid var(--line);padding-top:2mm}
+.mn{font-size:15pt;font-weight:700;color:var(--mark);line-height:1}
+.mt{font-size:10pt;font-weight:700;margin-top:1.2mm}
+.mech ul{list-style:none;margin-top:1mm}
+.mech li{font-size:8.3pt;line-height:1.55;padding:.5mm 0}
+.mech li b{font-weight:700}
+.prev{margin-top:6mm;border-left:.8mm solid var(--mark);padding:1mm 0 1mm 4mm}
+.pq{font-family:var(--serif);font-size:9.5pt;line-height:1.65;margin-top:1.2mm}
+.pa{font-size:8.6pt;margin-top:1.5mm;font-weight:700}
+/* ── 構面頁 ── */
+.dp-hero{background:#EFEAE0;margin:0 0 6mm;padding:5mm 6mm 6mm;border-radius:1mm;position:relative}
+.dp-n{position:absolute;right:6mm;top:2mm;font-family:var(--serif);font-weight:700;font-size:64pt;line-height:1;color:#DCD3C3}
+.dp-t{font-size:20pt;font-weight:700;letter-spacing:.08em;margin-top:5mm;position:relative}
+.dp-w{display:flex;align-items:baseline;gap:2.5mm;margin-top:3mm;font-size:9pt;color:var(--sub)}
+.dp-w b{font-size:20pt;font-weight:700;color:var(--ink)}
+.dp-c{margin-left:4mm;padding-left:4mm;border-left:.3mm solid var(--line);font-weight:700;color:var(--ink)}
+.dc{border-top:.35mm solid var(--ink);padding:2.6mm 0 4mm}
+.dc-h{display:flex;align-items:baseline;gap:3mm}
+.dc-code{font-size:17pt;font-weight:700;color:var(--mark)}
+.dc-t{font-size:12pt;font-weight:700;flex:1}
+.dc-p{font-size:13pt;font-weight:700}
+.dc-p small{font-size:7.5pt;color:var(--sub);margin-left:.5mm}
+.dc-q{margin-top:1.8mm;font-family:var(--serif);font-size:9.6pt;line-height:1.65;display:flex;gap:3mm;align-items:baseline}
+.dc-q .lab{font-family:var(--sans);flex:none}
+.dc-s{margin-top:2mm;display:flex;gap:1.5mm;flex-wrap:wrap}
+.dp-r{margin-top:auto;font-size:8.6pt;color:var(--sub);border-top:.2mm solid var(--line);padding-top:2.5mm}
+.dp-r b{color:var(--ink);font-weight:700}
+/* ── 第 29 頁 ── */
+.rt{width:100%;border-collapse:collapse;margin-top:3.5mm;table-layout:fixed}
+.rt th{font-size:7.8pt;font-weight:700;color:var(--sub);text-align:left;padding:0 1.5mm 1.2mm;border-bottom:.35mm solid var(--ink);letter-spacing:.08em}
+.rt th:first-child{width:6mm}
+.rt th:nth-child(2){width:52mm}
+.rt td{font-size:8.2pt;line-height:1.5;padding:1.3mm 1.5mm;border-bottom:.2mm solid var(--line2);vertical-align:top}
+.rt td.no{color:var(--mark);font-weight:700;text-align:center;padding-left:0;padding-right:0}
+.rt td.ra{font-weight:700}
+.rt tr.g td{font-size:8.4pt;font-weight:700;background:#EFEAE0;padding:1.3mm 2mm;border-bottom:none}
+.rt tr.g td span{float:right;font-weight:400;color:var(--sub);font-size:7.5pt}
+/* ── 第 30 頁 ── */
+.rfs{margin-top:3mm}
+.rf{border-top:.35mm solid var(--ink);padding:2.6mm 0 3.2mm}
+.rf-h{font-size:11pt;font-weight:700;display:flex;gap:3mm;align-items:baseline}
+.rf-n{font-size:8.5pt;color:var(--mark);letter-spacing:.1em;flex:none}
+.rf-d{margin-top:1.5mm;font-size:9pt;line-height:1.65}
+.rf-a{margin-top:1.8mm;font-size:8.4pt;line-height:1.6;background:#EFEAE0;padding:1.6mm 2.5mm;border-radius:.8mm}
+.rf-a .lab{margin-right:2.5mm}
+.rf-c{margin-left:2mm;white-space:nowrap}
+.rf-c .chip{margin:0 0 0 1mm}
+
+.dp-hero{margin-bottom:4mm}
+.dp-ph{flex:1;min-height:30mm;display:flex;flex-direction:column;margin-bottom:4mm}
+.dp-ph img{width:100%;height:0;flex:1 1 auto;object-fit:cover;border-radius:1mm;display:block}
+.dp-ph figcaption{font-size:7.4pt;color:var(--sub);margin-top:1.2mm}
+.dp-r{margin-top:2mm}
+.row2.nophoto.one .nums{grid-template-columns:1fr}
+.prof .m{justify-content:space-between}
+.prof .stats,.prof .vision,.prof .mech-lab,.prof .prev{margin-top:0!important}
+.prof .mech{margin-top:-4mm}
+.prof .stats{margin-top:6mm}.prof .sb{font-size:24pt}.prof .sl{font-size:8.6pt}
+.prof .vision{margin-top:8mm;padding:5mm 6mm 6mm}.prof .vt{font-size:19pt}.prof .vd{font-size:9.4pt}
+.prof .pt{padding:3mm 3mm}.prof .pt b{font-size:13.5pt}.prof .pt i{font-size:8.4pt}
+.prof .mech-lab{margin-top:9mm}.prof .mt{font-size:11pt}.prof .mech li{font-size:9pt}
+.prof .prev{margin-top:9mm}.prof .pq{font-size:10pt}.prof .pa{font-size:9.2pt}
+.rt td{font-size:8.3pt;padding:1.2mm 1.5mm}
+.rt tr.g td{padding:1.1mm 2mm}
+.reflp .rfs{flex:1;display:flex;flex-direction:column;justify-content:space-between}
+.reflp .rf-d{font-size:9.4pt}
+
+/* ── A4：以 B5 版型等比放大（zoom = 210/182） ── */
+.page{width:calc(210mm + 2*var(--b));height:calc(297mm + 2*var(--b))}
+.trim{zoom:var(--z);left:calc(var(--b) / var(--z));top:calc(var(--b) / var(--z));width:182mm;height:calc(297mm / var(--z))}
+/* 指標頁：區塊間距放寬、筆記欄縮小 */
+.ind .m{justify-content:space-between}
+.ind .quote{margin-top:6mm;padding:3.2mm 4.5mm}
+.ind .quote p{line-height:1.7}
+.ind .slides{margin-top:4.5mm}
+.ind .sum{margin-top:6mm}
+.ind .sum dl{margin-top:2mm}
+.ind .sum dl div{padding:1.85mm 0;gap:4mm}
+.ind .sum dt,.ind .sum dd{line-height:1.78}
+.ind .row2{margin-top:6mm}
+.ind .row2:not(.nophoto){flex:none;min-height:56mm}
+.ind .num{padding-top:2.2mm}
+.ind .nums{gap:4.5mm}
+.caution{margin-top:4.5mm;font-size:8.2pt;line-height:1.6;color:var(--ink);background:#EFEAE0;border-radius:.8mm;padding:1.8mm 3mm;display:flex;gap:3mm;align-items:baseline}
+.caution .lab{flex:none}
+.caution .cs-src{margin-left:auto;flex:none;font-size:7pt;color:var(--faint)}
+.ind .notes{margin-top:6mm;flex:1 1 auto;min-height:13mm;max-height:26mm}
+.chip.main{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.chip.main i{color:#D9D2C5}
+.ind.dense .sum dl div{padding:1.15mm 0}
+.ind.dense .sum{margin-top:4.5mm}
+.ind.dense .row2{margin-top:4.5mm}
+.ind.dense .row2:not(.nophoto){min-height:44mm}
+.ind.dense .notes{margin-top:4mm;min-height:11mm}
+
+.ind.sparse .m{justify-content:flex-start}
+.ind.sparse .notes{max-height:none}
+
+/* 11/24 修改 */
+.toc-lab{font-size:17pt!important;letter-spacing:.06em!important;color:var(--ink)!important;margin-top:8mm!important;padding-bottom:2mm!important}
+.legend .sub{font-size:13pt!important;border-left-width:.9mm!important;padding-left:2.5mm!important;margin-right:4mm!important}
+.legend{align-items:center}
+.dtab{width:100%;border-collapse:collapse;margin-top:1mm}
+.dtab th{font-size:7.8pt;font-weight:700;color:var(--sub);text-align:left;padding:0 2mm 1.4mm;border-bottom:.35mm solid var(--ink);letter-spacing:.08em}
+.dtab th:nth-child(3),.dtab th:nth-child(4){text-align:center;width:16mm}
+.dtab td{padding:3mm 2mm;border-bottom:.25mm solid var(--line);vertical-align:baseline}
+.dtab .dt-c{font-size:15pt;font-weight:700;color:var(--mark);width:16mm;padding-left:0}
+.dtab .dt-t{font-size:11.5pt;font-weight:700}
+.dtab .dt-w{font-size:13pt;font-weight:700;text-align:center}
+.dtab .dt-p{font-size:13pt;font-weight:700;text-align:center}
+.dtab .dt-p::after{content:"頁";font-size:7.5pt;color:var(--sub);margin-left:.4mm;font-weight:400}
+.dimp .dp-ph{min-height:60mm}
