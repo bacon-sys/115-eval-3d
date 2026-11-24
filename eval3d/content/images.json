@@ -1099,5 +1099,23 @@
   "thumb": "img/thumb/21f90a85fb.jpg",
   "w": 1600,
   "h": 1200
+ },
+ "SCAN0665_page-0004.jpg": {
+  "full": "img/full/9986d0ead0.jpg",
+  "thumb": "img/thumb/9986d0ead0.jpg",
+  "w": 1600,
+  "h": 1131
+ },
+ "SCAN0666_page-0002.jpg": {
+  "full": "img/full/837c3b7c87.jpg",
+  "thumb": "img/thumb/837c3b7c87.jpg",
+  "w": 1600,
+  "h": 1131
+ },
+ "image.png": {
+  "full": "img/full/c2ca448d93.png",
+  "thumb": "img/thumb/c2ca448d93.jpg",
+  "w": 602,
+  "h": 874
  }
 }
