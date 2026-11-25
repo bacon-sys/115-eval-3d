@@ -352,14 +352,14 @@ def notes_page(num):
 
 
 def back_cover(num):
-    links = [('評鑑網站（3D 導覽）', 'bacon-sys.github.io/115-eval-3d/'),
-             ('全文閱讀首頁', 'bacon-sys.github.io/115-eval-3d/#phome'),
+    links = [('大同國中實驗教育評鑑網站（3D 導覽）', 'bacon-sys.github.io/115-eval-3d/'),
+             ('大同國中實驗教育評鑑網站（純文字版）', 'helix-mitten-106.notion.site/<br>3c81d191518e817b9b3feb91979aedc2'),
              ('三年山徑（課程地圖）', 'bacon-sys.github.io/datong-trail/'),
-             ('網站地圖', 'bacon-sys.github.io/115-eval-sitemap/')]
+             ('評鑑網站地圖', 'bacon-sys.github.io/115-eval-sitemap/')]
     lis = ''.join(f'<li><span class="bl">{e(t)}</span><span class="url">{u}</span></li>' for t, u in links)
     body = f'''<p class="bc-h">17 項指標完整內容請見評鑑網站</p>
 <div class="bc-mid">
-  <div class="bc-qr"><img src="img/qr_sitemap.svg" alt=""><p>評鑑網站地圖</p></div>
+  <div class="bc-qr"><img src="img/qr_3d.svg" alt=""><p>評鑑網站（3D 導覽）</p></div>
   <ul class="bc-links">{lis}</ul>
 </div>
 <div class="bc-bot">{diamond()}<p class="bc-s">宜蘭縣立大同國民中學</p><p class="bc-t">115 學年度宜蘭縣原住民族實驗教育評鑑｜評鑑導讀手冊</p></div>'''
