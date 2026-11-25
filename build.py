@@ -297,9 +297,9 @@ def profile_page():
 <h1>帶著孩子，共同踏上成為 Tayal balay 的道路</h1></header>
 <div class="stats">
   <div><p class="sb">33<small>位</small></p><p class="sl">學生，全數為泰雅族</p></div>
-  <div><p class="sb">4<small>個部落</small></p><p class="sl">南山・四季・茂安・英士</p></div>
+  <div><p class="sb">4<small>個部落</small></p><p class="sl">南山・四季<br>茂安・英士</p></div>
   <div><p class="sb">107<small>學年度</small></p><p class="sl">轉型實驗教育</p></div>
-  <div><p class="sb">119.7.31</p><p class="sl">核定期程至 119 年 7 月 31 日</p></div>
+  <div><p class="sb">119.7.31</p><p class="sl">核定期程（107.8.1 起）</p></div>
 </div>
 <div class="vision"><p class="vt">Tayal balay<span>（真正的泰雅人）</span></p>
 <p class="vd">自 gaga（祖靈的話語與訓誡）中，全校師生共同析出四項核心特質</p>
@@ -326,7 +326,7 @@ def resp_page():
             rows += f'<tr><td class="no">{k}</td><td class="ra">{e(a)}</td><td class="rb">{boldnum(e(b))}</td></tr>'
     body = f'''<header class="sh"><p class="kick">{diamond()}<span>回應前次評鑑</span><span class="pg-ref">簡報 P23｜指標 6-3</span></p>
 <h1>前次 13 項建議，逐項回應</h1>
-<p class="lead">依「宜蘭縣 112 學年度原住民族實驗教育評鑑結果報告書」委員書面審查意見摘錄，對照本校回應作法（摘要）。</p></header>
+<p class="lead">依「宜蘭縣 112 學年度原住民族實驗教育評鑑結果報告書」委員書面審查意見摘錄，對照本校回應作法。112 學年度六個項目與本次構面相同；項目五（相關法規之遵行）委員未提具體建議。</p></header>
 <table class="rt"><thead><tr><th></th><th>委員建議（摘要）</th><th>本校回應（摘要）</th></tr></thead><tbody>{rows}</tbody></table>'''
     return page(29, body, 'respp')
 
@@ -352,16 +352,14 @@ def notes_page(num):
 
 
 def back_cover(num):
-    links = [('大同國中實驗教育評鑑網站（3D 導覽）', 'bacon-sys.github.io/115-eval-3d/'),
-             ('大同國中實驗教育評鑑網站（純文字版）', 'helix-mitten-106.notion.site/<br>3c81d191518e817b9b3feb91979aedc2'),
-             ('三年山徑（課程地圖）', 'bacon-sys.github.io/datong-trail/'),
-             ('評鑑網站地圖', 'bacon-sys.github.io/115-eval-sitemap/')]
-    lis = ''.join(f'<li><span class="bl">{e(t)}</span><span class="url">{u}</span></li>' for t, u in links)
+    links = [('qr_3d.svg', '評鑑網站（3D 導覽）', 'bacon-sys.github.io/115-eval-3d/'),
+             ('qr_notion.svg', '評鑑網站（Notion 版）', 'helix-mitten-106.notion.site/<br>3c81d191518e817b9b3feb91979aedc2'),
+             ('qr_trail.svg', '三年山徑（課程地圖）', 'bacon-sys.github.io/datong-trail/'),
+             ('qr_sitemap.svg', '評鑑網站地圖', 'bacon-sys.github.io/115-eval-sitemap/')]
+    cards = ''.join(f'<div class="bq"><img src="img/{q}" alt=""><p class="bl">{e(t)}</p><p class="url">{u}</p></div>'
+                    for q, t, u in links)
     body = f'''<p class="bc-h">17 項指標完整內容請見評鑑網站</p>
-<div class="bc-mid">
-  <div class="bc-qr"><img src="img/qr_3d.svg" alt=""><p>評鑑網站（3D 導覽）</p></div>
-  <ul class="bc-links">{lis}</ul>
-</div>
+<div class="bc-grid">{cards}</div>
 <div class="bc-bot">{diamond()}<p class="bc-s">宜蘭縣立大同國民中學</p><p class="bc-t">115 學年度宜蘭縣原住民族實驗教育評鑑｜評鑑導讀手冊</p></div>'''
     return page(num, body, 'back', foot=False)
 

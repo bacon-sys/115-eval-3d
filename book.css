@@ -316,3 +316,10 @@ body{font-family:var(--sans);color:var(--ink);font-size:9.5pt;line-height:1.7;-w
 .dtab .dt-p{font-size:13pt;font-weight:700;text-align:center}
 .dtab .dt-p::after{content:"頁";font-size:7.5pt;color:var(--sub);margin-left:.4mm;font-weight:400}
 .dimp .dp-ph{min-height:60mm}
+
+/* 封底：四個 QR code */
+.bc-grid{display:grid;grid-template-columns:1fr 1fr;gap:9mm 12mm;margin:0 auto auto;padding:0 10mm;width:100%}
+.bq{text-align:center}
+.bq img{width:34mm;height:34mm;display:block;margin:0 auto;padding:2.5mm;background:#fff;border-radius:1mm}
+.bq .bl{margin-top:2.6mm;font-size:9.5pt;font-weight:700;letter-spacing:.06em}
+.bq .url{margin-top:.8mm;font-size:7.8pt;color:var(--sub);line-height:1.4;word-break:break-all}
