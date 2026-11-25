@@ -336,7 +336,7 @@ def refl_page():
     nm = '一二三四五'
     blocks = ''
     for i, (q, d, act, refs) in enumerate(REFL):
-        chips = ''.join(chip(r) for r in refs)
+        chips = ''.join(chip(r, pg=False) for r in refs)
         blocks += f'''<div class="rf"><p class="rf-h"><span class="rf-n">省思{nm[i]}</span>{e(q)}</p>
 <p class="rf-d">{e(d)}</p><p class="rf-a"><span class="lab">對應作為</span>{boldnum(e(act))}<span class="rf-c">{chips}</span></p></div>'''
     body = f'''<header class="sh"><p class="kick">{diamond()}<span>民族教育省思</span><span class="pg-ref">簡報 P24｜指標 6-3</span></p>
