@@ -867,7 +867,11 @@ function placeLabels() {
     };
     const wantName = !L.ind || showNames || hovered === L.ind || L.el.matches(':hover, :focus-visible');
     const forced = L.ind && (hovered === L.ind || L.el.matches(':hover, :focus-visible'));
-    let res = wantName ? (tryAt(L.fw, L.fh) || (forced ? [{ x: L.x - L.fw / 2, y: L.y - L.fh, w: L.fw, h: L.fh }, 0] : null)) : null;
+    // 滑鼠停在標籤上：鎖定位置，展開時代碼留在原處、名稱往右延伸（不再重新找空位，避免標籤移開滑鼠又縮回而一直跳動）
+    if (forced && !L.lock) L.lock = L.prevCompact ? [(L.prevDx || 0) - 23 + L.fw / 2, L.prevSt || 0] : [L.prevDx || 0, L.prevSt || 0];
+    if (!forced) L.lock = null;
+    let res = L.lock ? [{ x: L.x + L.lock[0] - L.fw / 2, y: L.y - L.lock[1] - L.fh, w: L.fw, h: L.fh }, L.lock[1], L.lock[0]]
+      : wantName ? tryAt(L.fw, L.fh) : null;
     L.el.classList.toggle('lift', !!forced);
     if (!res && L.ind) { compact = true; res = tryAt(46, 34) || [{ x: L.x - 23, y: L.y - 40, w: 46, h: 34 }, 0]; }
     const crowd = !res && !L.ind && !L.vl && L.pri === 2 && narrow; // 手機：構面名牌找不到空位時暫時隱藏（拉近或看圖例仍可得知），不擋住代碼
@@ -880,6 +884,7 @@ function placeLabels() {
     el.style.transform = `translate(${L.x + dx}px, ${L.y - stem}px) translate(-50%, -100%)`;
     el.style.setProperty('--tail', `${-dx}px`);
     el.style.visibility = L.vis ? 'visible' : 'hidden';
+    L.prevDx = dx; L.prevSt = stem; L.prevCompact = compact;
   }
 }
 
