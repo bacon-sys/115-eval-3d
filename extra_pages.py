@@ -63,7 +63,7 @@ def timeline_svg():
     return ''.join(s)
 
 
-def ritual_page(num, diamond):
+def ritual_page(num, diamond, map_no):
     cards = ''.join(
         f'<div class="x-ev" style="--c:{c}"><p class="x-evm">{m}</p><p class="x-evt"><b>{t}</b><i>{z}</i></p><p class="x-evd">{e(d)}</p></div>'
         for m, t, z, d, c in EVENTS)
@@ -75,7 +75,7 @@ def ritual_page(num, diamond):
         rows += f'<tr><th class="x-dn" style="--c:{c}"><b>{dn}</b><small>{ds}</small></th>{cells}</tr>'
     fld = ''.join('<td>' + ''.join((f'<span class="x-fd"><span class="x-no">{n}</span>{t}</span>' if n else f'<span class="x-fd x-nn">{t}</span>') for n, t in FIELDS[g]) + '</td>'
                   for g, _ in GRADES)
-    rows += f'<tr class="x-frow"><th class="x-dn"><b>主要場域</b><small>對照右頁地圖</small></th>{fld}</tr>'
+    rows += f'<tr class="x-frow"><th class="x-dn"><b>主要場域</b><small>對照第 {map_no} 頁地圖</small></th>{fld}</tr>'
     inner = f'''<p class="kick">{diamond()}<span>歲時與課程</span></p>
 <h1>歲時祭儀與三年課程</h1>
 <p class="g-lead">以小米生命週期為軸線，串連祭儀、農事與學生實作；三年文化課程依四個構面，安排 21 個主題。</p>
