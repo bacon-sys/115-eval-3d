@@ -12,14 +12,14 @@ e = html.escape
 
 # ───────── 左頁：歲時祭儀與三年課程 ─────────
 EVENTS = [  # 月份（學年順序 8..7）, 標題, 族語, 說明（取自 6-2 年度循環圖）, 色
-    ('8–9 月、11 月', 'magu byaling', '祭儀準備期', '備儀分工、醃肉與小米酒、陷阱製作、獵物捕捉，並持續觀測月相。', '#C98B5A'),
-    ('10 月', '祖靈感恩祭', 'Cmyus', '以親手製作之祭品獻祭，回顧一年並感謝祖靈。', '#9A84B6'),
+    ('9 月、11 月', 'magu byaling', '祭儀準備期', '備儀分工、醃肉與小米酒、陷阱製作、獵物捕捉，並持續觀測月相。', '#C7A048'),
+    ('10 月', '感恩祖靈祭', 'Cmyus', '以親手製作之祭品獻祭，回顧一年並感謝祖靈。', '#9A84B6'),
     ('12 月', '小米播種祭', 'Smgatu', '由部落耆老帶領，師生於清晨依傳統儀式流程共同完成祭儀。', '#C9706A'),
     ('2 月', '播種', 'tmubux', '於校園小米田實際進行播種作業。', '#6F93B8'),
     ('6 月', '採收／小米收割祭', 'kmluh', '師生共同收割，依傳統流程辦理儀式。', '#6E9C7A'),
 ]
 MONTHS = [8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7]
-MARK = {8: 0, 9: 0, 11: 0, 10: 1, 12: 2, 2: 3, 6: 4}  # 月份 → EVENTS 索引
+MARK = {9: 0, 11: 0, 10: 1, 12: 2, 2: 3, 6: 4}  # 月份 → EVENTS 索引
 
 GRADES = [('七年級', '燒墾生活'), ('八年級', 'gaga 家庭與編織'), ('九年級', '山林智慧')]
 DIMS = [('自然與環境', '人與自然', '#5E8F6B', '#E3EDE2'), ('組織與結構', '人與社會', '#C07A4E', '#F5E8DC'),
@@ -32,7 +32,8 @@ TOPICS = {  # 依三年山徑 data.js（id 1–21）
     ('九年級', 0): ['傳統建築與生活', '漁獵生態體驗'], ('九年級', 1): ['族群遷徙與歷史'],
     ('九年級', 2): ['竹製生活器具(2)', '木製生活器具(2)', '藤製生活器具(2)'], ('九年級', 3): ['專題研究實作'],
 }
-FIELDS = {'七年級': [(1, '小米田'), (6, '工寮')], '八年級': [(2, '苧麻園'), (7, '文化廊道')], '九年級': [(4, '傳統穀倉')]}
+FIELDS = {'七年級': [(1, '小米田'), (6, '工寮'), (8, '青年學習場域')], '八年級': [(2, '苧麻園'), (7, '文化廊道')],
+          '九年級': [(4, '傳統穀倉'), (3, '傳統家屋'), (5, '瞭望台'), (None, '後山獵徑')]}
 
 
 def timeline_svg():
@@ -72,7 +73,7 @@ def ritual_page(num, diamond):
         cells = ''.join('<td>' + ''.join(f'<span class="x-tp" style="--c:{c};--t:{tint}">{e(t)}</span>' for t in TOPICS[(g, k)]) + '</td>'
                         for g, _ in GRADES)
         rows += f'<tr><th class="x-dn" style="--c:{c}"><b>{dn}</b><small>{ds}</small></th>{cells}</tr>'
-    fld = ''.join('<td>' + ''.join(f'<span class="x-fd"><span class="x-no">{n}</span>{t}</span>' for n, t in FIELDS[g]) + '</td>'
+    fld = ''.join('<td>' + ''.join((f'<span class="x-fd"><span class="x-no">{n}</span>{t}</span>' if n else f'<span class="x-fd x-nn">{t}</span>') for n, t in FIELDS[g]) + '</td>'
                   for g, _ in GRADES)
     rows += f'<tr class="x-frow"><th class="x-dn"><b>主要場域</b><small>對照右頁地圖</small></th>{fld}</tr>'
     inner = f'''<p class="kick">{diamond()}<span>歲時與課程</span></p>
@@ -83,7 +84,7 @@ def ritual_page(num, diamond):
 <div class="x-evs">{cards}<p class="x-evq">從 magu byaling 到祭儀的完整歷程，使學生理解泰雅族歲時生活與祖靈信仰、土地倫理之間的深刻連結。</p></div></div>
 <div class="g-sec"><div class="x-sh">三年文化課程：四構面 × 21 個主題<small>依三年山徑（課程地圖）</small></div>
 <table class="x-ct"><thead><tr><th></th>{head}</tr></thead><tbody>{rows}</tbody></table>
-<p class="g-cap">每個主題依主要學習重點歸入一個構面，實際課程常跨越多個構面。主要場域依網站 2-1 文化場域之教學用途。</p></div>'''
+<p class="g-cap">每個主題依主要學習重點歸入一個構面，實際課程常跨越多個構面。主要場域依網站 2-1 文化場域之教學用途與學校說明。</p></div>'''
     return _page(num, inner)
 
 
@@ -405,6 +406,7 @@ CSS = """
 .x-tp{display:inline-block;background:var(--t);color:#3B3936;border-radius:1.2mm;padding:.5mm 2mm;margin:0 1.2mm 1.2mm 0;font-size:9pt;line-height:1.5}
 .x-frow th,.x-frow td{border-top:.3mm dashed #CDBFA9;padding-top:2mm}
 .x-fd{display:inline-flex;align-items:center;gap:1.2mm;margin:0 2.4mm 1mm 0;font-size:9pt;font-weight:700}
+.x-fd.x-nn{border:.3mm dashed #8FAE88;border-radius:1.2mm;padding:0 1.6mm;color:#4E7A52}
 .x-no{flex:none;width:4.6mm;height:4.6mm;border-radius:50%;background:#A9654C;color:#fff;font-size:7.6pt;font-weight:700;display:inline-grid;place-items:center}
 .x-map .fld{font-size:34px;font-weight:700;text-anchor:middle;fill:#6E9A5E;letter-spacing:6px}
 .x-scs{display:grid;grid-template-columns:repeat(3,1fr);gap:2.2mm 3mm;margin-top:3mm}
