@@ -373,7 +373,7 @@ def map_page(num, diamond):
 <p class="g-lead">逐年與部落耆老合作建置泰雅傳統建築群，使校園具備泰雅微型部落之功能。</p>
 <div class="x-mapbox">{map_svg()}</div>
 <div class="x-scs">{cards}</div>
-<p class="g-cap">場域與教學用途依網站 2-1（烤火屋依學校說明）；位置依學校校舍配置圖繪製，非等比例。</p>'''
+<p class="g-cap">場域與教學用途依網站 2-1；位置依學校校舍配置圖繪製，非等比例。</p>'''
     return _page(num, inner)
 
 
