@@ -140,6 +140,21 @@ def hut(x, y, s=1.0):
             '<path d="M2 -32 Q-4 -40 2 -48" stroke="#E07B3E" stroke-width="5" fill="none" stroke-linecap="round"/></g>')
 
 
+def pavilion(x, y):
+    """青年學習場域：長形開放式涼亭（側面），低斜屋頂、整排木柱、柴堆與長桌"""
+    posts = ''.join(f'<rect x="{px - 3}" y="-50" width="6" height="50" fill="#7A5A40"/>' for px in range(-74, 80, 21))
+    return (f'<g transform="translate({x},{y})">'
+            '<rect x="-84" y="-2" width="168" height="8" rx="4" fill="#CDBB9C"/>'
+            f'{posts}'
+            '<rect x="-46" y="-22" width="52" height="5" rx="2" fill="#9C7656"/><path d="M-40 -17 V-4 M0 -17 V-4" stroke="#9C7656" stroke-width="3"/>'
+            '<g fill="#A97B57"><circle cx="30" cy="-6" r="6"/><circle cx="42" cy="-6" r="6"/><circle cx="54" cy="-6" r="6"/><circle cx="36" cy="-16" r="6"/><circle cx="48" cy="-16" r="6"/></g>'
+            '<g fill="#C9A982"><circle cx="30" cy="-6" r="2.5"/><circle cx="42" cy="-6" r="2.5"/><circle cx="54" cy="-6" r="2.5"/><circle cx="36" cy="-16" r="2.5"/><circle cx="48" cy="-16" r="2.5"/></g>'
+            '<path d="M-96 -46 L96 -46 L84 -66 L-84 -66Z" fill="#8E8778"/>'
+            '<path d="M-96 -46 L96 -46" stroke="#6E6759" stroke-width="4"/>'
+            + ''.join(f'<path d="M{px} -66 L{px + 3} -46" stroke="#A9A293" stroke-width="2"/>' for px in range(-80, 90, 12)) +
+            '</g>')
+
+
 def label(x, y, n, t, anchor='l'):
     """編號圓點＋白底名牌；anchor: l 名牌在右、r 名牌在左、t 名牌在下"""
     w = 34 + len(t) * 29
@@ -180,7 +195,7 @@ def bldg(x, y, w, h, lines, fill='#F2D9D3', cls='bl'):
 
 
 def map_svg():
-    W, H = 1600, 1420
+    W, H = 1600, 1500
     s = [f'<svg viewBox="0 0 {W} {H}" class="x-map" xmlns="http://www.w3.org/2000/svg">',
          '<defs><pattern id="dia" width="40" height="40" patternUnits="userSpaceOnUse">'
          '<rect width="40" height="40" fill="#C2524A"/><path d="M20 4 L34 20 L20 36 L6 20Z" fill="#FFF7EE"/>'
@@ -248,7 +263,7 @@ def map_svg():
              '<rect x="34" y="10" width="20" height="16" rx="3" fill="#F6E6E1"/><rect x="58" y="10" width="20" height="16" rx="3" fill="#F6E6E1"/>'
              '<circle cx="24" cy="36" r="9" fill="#3B3936"/><circle cx="78" cy="36" r="9" fill="#3B3936"/></g>')
     # ── 南側校園
-    s.append('<rect x="20" y="666" width="1560" height="640" rx="36" fill="#F3EDE2"/>')
+    s.append('<rect x="20" y="666" width="1560" height="620" rx="36" fill="#F3EDE2"/>')
     s.append('<g><rect x="150" y="652" width="86" height="34" rx="8" fill="#8C7B69"/><text x="193" y="676" class="gt">側門</text></g>')
     s.append('<g><rect x="1010" y="652" width="86" height="34" rx="8" fill="#8C7B69"/><text x="1053" y="676" class="gt">大門</text></g>')
     # 左列：停車場、宿舍、廁所、儲藏室
@@ -266,12 +281,9 @@ def map_svg():
     # 瞭望台（往上、靠近樹）
     s.append('<g transform="translate(880,812)"><path d="M-22 0 L-14 -96 M22 0 L14 -96 M-18 -40 H18 M-16 -70 H16" stroke="#7A5A40" stroke-width="6" stroke-linecap="round"/>'
              '<rect x="-28" y="-112" width="56" height="18" rx="4" fill="#A97B57"/><path d="M-36 -110 L0 -142 L36 -110Z" fill="#C9A56A"/></g>')
-    # 青年學習場域（半開放長形傳統建築：俯視屋頂＋四周柱列＋柴堆）
-    s.append('<g><rect x="1046" y="708" width="116" height="300" rx="8" fill="url(#slate)" stroke="#6E6759" stroke-width="3"/>'
-             '<path d="M1104 708 V1008" stroke="#C2524A" stroke-width="8"/>')
-    for yy in range(722, 1000, 34):
-        s.append(f'<rect x="1038" y="{yy}" width="10" height="10" rx="2" fill="#7A5A40"/><rect x="1160" y="{yy}" width="10" height="10" rx="2" fill="#7A5A40"/>')
-    s.append('<g transform="translate(1186,980)"><rect x="-10" y="-8" width="22" height="8" rx="4" fill="#9C7656"/><rect x="-6" y="-16" width="22" height="8" rx="4" fill="#B88A5E"/></g></g>')
+    # 青年學習場域（依網站照片：長形開放式涼亭，低斜屋頂、整排木柱、柴堆）
+    s.append('<rect x="1046" y="708" width="116" height="300" rx="14" fill="#E4D8C2"/>')
+    s.append(pavilion(1104, 900))
     # 家屋、第二座穀倉
     s.append('<g transform="translate(1290,748)"><rect x="-70" y="-30" width="140" height="56" rx="8" fill="#A47A58"/>'
              '<path d="M-90 -26 L0 -76 L90 -26Z" fill="#7E6A55"/><path d="M-90 -26 L0 -76 L90 -26" fill="none" stroke="#5F5040" stroke-width="4"/>'
@@ -289,19 +301,29 @@ def map_svg():
     # 教學行政大樓（前棟）、專科教室大樓（後棟）
     s.append(bldg(262, 1028, 880, 66, ['教學行政大樓（前棟）']))
     s.append(bldg(700, 1118, 460, 80, ['專科教室大樓（後棟）・圖書館'], '#EBD0CA', 'bs'))
-    # 後山小徑（儲藏室下方長條）
-    s.append('<rect x="44" y="1222" width="640" height="56" rx="28" fill="#D8C3A2"/>'
-             '<path d="M70 1250 H660" stroke="#BFA47D" stroke-width="5" stroke-dasharray="4 16" stroke-linecap="round"/>')
-    s.append(plain(364, 1259, '後山小徑', 'bl'))
-    # 後山獵徑（校園外左下：狩獵課程場域）
-    s.append('<path d="M0 1300 Q200 1290 420 1316 Q560 1330 720 1320 L720 1420 L0 1420Z" fill="#6E9E68"/>')
-    s.append('<path d="M60 1410 Q140 1360 250 1374 Q360 1388 440 1344 Q520 1306 650 1330" stroke="#E7D3B0" stroke-width="7" fill="none" stroke-dasharray="14 10" stroke-linecap="round"/>')
-    s += [pine(40, 1380, .75, '#3F7550', '#4E8A5E'), pine(330, 1412, .7, '#3F7550', '#4E8A5E'), pine(560, 1400, .75, '#3F7550', '#4E8A5E'), pine(690, 1388, .65, '#3F7550', '#4E8A5E')]
-    for px, py in [(180, 1376), (210, 1364)]:
-        s.append(f'<g transform="translate({px},{py})" fill="#8A6A4E"><ellipse cx="0" cy="0" rx="6" ry="7"/><circle cx="-7" cy="-9" r="3"/><circle cx="0" cy="-12" r="3"/><circle cx="7" cy="-9" r="3"/></g>')
-    s.append(tag(470, 1378, '後山獵徑（狩獵課程場域）', 330))
+    # 後山獵徑：入口在儲藏室與專科教室大樓之間的空地，往下延伸為整片後山林地
+    s.append('<path d="M0 1262 Q160 1236 330 1258 Q520 1284 720 1262 Q930 1240 1120 1266 Q1340 1290 1600 1258 V1500 H0Z" fill="#7FAE76"/>')
+    s.append('<path d="M0 1330 Q220 1300 460 1330 Q700 1356 960 1326 Q1240 1300 1600 1334 V1500 H0Z" fill="#6E9E68"/>')
+    # 林木
+    import random
+    rnd = random.Random(7)
+    for k in range(60):
+        x = 24 + (k % 34) * 46 + rnd.randint(-14, 14) + (23 if k >= 34 else 0); y = (1300 if k < 34 else 1395) + rnd.randint(0, 2) * 34 + rnd.randint(-8, 8)
+        if (300 < x < 480 and y > 1270) or (640 < x < 1200 and y > 1420):
+            continue
+        s.append(pine(x, y, .62 + rnd.random() * .25, '#3F7550', '#4E8A5E') if k % 3 else tree(x, y, .65, '#86B77C', '#5E9560'))
+    # 入口空地＋步道
+    s.append('<path d="M420 1176 Q400 1230 360 1268 Q300 1330 380 1380 Q460 1428 400 1490" stroke="#EAD8B6" stroke-width="12" fill="none" stroke-linecap="round"/>')
+    s.append('<path d="M420 1176 Q400 1230 360 1268 Q300 1330 380 1380 Q460 1428 400 1490" stroke="#C9AE84" stroke-width="3" fill="none" stroke-dasharray="10 12"/>')
+    s.append('<path d="M372 1376 Q560 1400 720 1372" stroke="#EAD8B6" stroke-width="9" fill="none" stroke-linecap="round"/>')
+    for px, py in [(330, 1312), (350, 1296), (560, 1392), (590, 1386)]:
+        s.append(f'<g transform="translate({px},{py})" fill="#7A5E44"><ellipse cx="0" cy="0" rx="6" ry="7"/><circle cx="-7" cy="-9" r="3"/><circle cx="0" cy="-12" r="3"/><circle cx="7" cy="-9" r="3"/></g>')
+    # 入口木牌
+    s.append('<g transform="translate(470,1196)"><path d="M0 0 V40" stroke="#7A5A40" stroke-width="6"/><rect x="-58" y="-22" width="116" height="36" rx="6" fill="#B88A5E" stroke="#7A5A40" stroke-width="3"/>'
+             '<text x="0" y="3" class="gt">獵徑入口</text></g>')
+    s.append(tag(920, 1458, '後山獵徑（狩獵課程場域）', 400, 'mt'))
     # 樹、藍鵲、指北
-    s += [tree(1180, 1290, .7), tree(470, 700, .6), tree(1520, 1150, .75), tree(1520, 1260, .7)]
+    s += [tree(470, 700, .6), tree(1520, 1150, .75), tree(1530, 1240, .65)]
     for bx, by in [(560, 120), (1420, 60)]:
         s.append(f'<g transform="translate({bx},{by})"><ellipse cx="0" cy="0" rx="18" ry="11" fill="#3E6FB0"/><circle cx="16" cy="-7" r="8" fill="#2F3B57"/>'
                  f'<path d="M-16 2 L-58 16 L-54 6 L-16 -4Z" fill="#3E6FB0"/><path d="M22 -7 L32 -4 L22 -2Z" fill="#E0663E"/></g>')
