@@ -155,6 +155,26 @@ def pavilion(x, y):
             '</g>')
 
 
+def pavilion_v(x, y, w, h):
+    """青年學習場域（直式）：長形屋頂由上往下延伸、南端露出山牆面的整排木柱、長桌與柴堆"""
+    rh = h - 64                       # 屋頂長度
+    out = [f'<g transform="translate({x},{y})">']
+    out.append(f'<rect x="0" y="0" width="{w}" height="{h}" rx="12" fill="#E4D8C2"/>')
+    # 屋頂（兩坡，左寬右窄＝斜上方視角）＋橫向竹片
+    out.append(f'<path d="M4 6 H{w - 4} V{rh} H4Z" fill="#8E8778"/>')
+    out.append(f'<path d="M{w * .62:.0f} 6 H{w - 4} V{rh} H{w * .62:.0f}Z" fill="#77705F"/>')
+    out.append(''.join(f'<path d="M6 {yy} H{w - 6}" stroke="#A9A293" stroke-width="2"/>' for yy in range(18, rh - 4, 13)))
+    out.append(f'<path d="M{w * .62:.0f} 6 V{rh}" stroke="#5F584A" stroke-width="5"/>')
+    out.append(f'<path d="M4 {rh} H{w - 4}" stroke="#5F584A" stroke-width="4"/>')
+    # 南端山牆面：木柱、長桌、柴堆
+    out.append(f'<rect x="8" y="{h - 10}" width="{w - 16}" height="6" rx="3" fill="#CDBB9C"/>')
+    out.append(''.join(f'<rect x="{px}" y="{rh}" width="6" height="{h - rh - 8}" fill="#7A5A40"/>' for px in range(10, w - 10, 22)))
+    out.append(f'<rect x="22" y="{h - 30}" width="40" height="5" rx="2" fill="#9C7656"/>')
+    out.append(''.join(f'<circle cx="{cx}" cy="{cy}" r="5" fill="#A97B57"/>' for cx, cy in [(78, h - 16), (88, h - 16), (98, h - 16), (83, h - 25), (93, h - 25)]))
+    out.append('</g>')
+    return ''.join(out)
+
+
 def label(x, y, n, t, anchor='l'):
     """編號圓點＋白底名牌；anchor: l 名牌在右、r 名牌在左、t 名牌在下"""
     w = 34 + len(t) * 29
@@ -282,8 +302,7 @@ def map_svg():
     s.append('<g transform="translate(880,812)"><path d="M-22 0 L-14 -96 M22 0 L14 -96 M-18 -40 H18 M-16 -70 H16" stroke="#7A5A40" stroke-width="6" stroke-linecap="round"/>'
              '<rect x="-28" y="-112" width="56" height="18" rx="4" fill="#A97B57"/><path d="M-36 -110 L0 -142 L36 -110Z" fill="#C9A56A"/></g>')
     # 青年學習場域（依網站照片：長形開放式涼亭，低斜屋頂、整排木柱、柴堆）
-    s.append('<rect x="1046" y="708" width="116" height="300" rx="14" fill="#E4D8C2"/>')
-    s.append(pavilion(1104, 900))
+    s.append(pavilion_v(1046, 708, 116, 300))
     # 家屋、第二座穀倉
     s.append('<g transform="translate(1290,748)"><rect x="-70" y="-30" width="140" height="56" rx="8" fill="#A47A58"/>'
              '<path d="M-90 -26 L0 -76 L90 -26Z" fill="#7E6A55"/><path d="M-90 -26 L0 -76 L90 -26" fill="none" stroke="#5F5040" stroke-width="4"/>'
@@ -339,7 +358,7 @@ def map_svg():
           label(1440, 290, 6, '工寮', 'r'),
           dot(1004, 414, 6),
           label(1226, 924, 7, '文化廊道', 'l'),
-          label(1032, 978, 8, '青年學習場域', 'r'),
+          label(1032, 860, 8, '青年學習場域', 'r'),
           label(744, 230, 9, '烤火屋', 'r')]
     s.append('</svg>')
     return ''.join(s)
