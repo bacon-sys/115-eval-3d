@@ -271,7 +271,7 @@ def toc_page():
     ]
     g = ''.join(f'<li>{e(t)}</li>' for t in guide)
     front = [('學校概況', 3), ('評鑑網站（3D 導覽）使用指南', 4), ('四項核心特質 × 17 項指標', 6)]
-    back = [('前次評鑑 13 項建議回應摘要', 31), ('民族教育省思', 32), ('綜合座談筆記', 33), ('評鑑網站', 36)]
+    back = [('前次評鑑 13 項建議回應摘要', 31), ('民族教育省思', 32), ('綜合座談筆記', 33), ('歲時祭儀與三年課程・校園文化場域地圖', '34–35'), ('評鑑網站', 36)]
     def row(t, p, cls=''):
         return f'<li class="{cls}"><span class="tt">{t}</span><span class="dots"></span><span class="tp">{p}</span></li>'
     dims = ''
@@ -365,7 +365,8 @@ def back_cover(num):
 
 
 from guide_pages import guide_pages, CSS as GUIDE_CSS
-CSS = (ROOT / 'book.css').read_text() + GUIDE_CSS
+from extra_pages import ritual_page, map_page, CSS as EXTRA_CSS
+CSS = (ROOT / 'book.css').read_text() + GUIDE_CSS + EXTRA_CSS
 
 
 def build(mode, bleed):
@@ -376,7 +377,7 @@ def build(mode, bleed):
         for dm in DATA['dims']:
             pages.append(dim_page(dm))
             pages += [ind_page(i['code']) for i in dm['inds']]
-        pages += [resp_page(), refl_page(), notes_page(33), notes_page(34, '筆記', '筆記'), notes_page(35, '筆記', '筆記'), back_cover(36)]
+        pages += [resp_page(), refl_page(), notes_page(33), ritual_page(34, diamond), map_page(35, diamond), back_cover(36)]
     b = 3 if bleed else 0
     doc = f'''<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
 <style>:root{{--b:{b}mm;--z:{210/182}}} @page{{size:{210 + 2 * b}mm {297 + 2 * b}mm;margin:0}}</style>
