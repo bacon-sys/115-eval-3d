@@ -49,9 +49,9 @@ def chapter_of(p):
     raise ValueError(p)
 
 
-# ── 手冊頁碼：構面頁＋指標頁從第 6 頁起 ──
+# ── 手冊頁碼：第 4–5 頁使用指南、第 6–7 頁對照跨頁，構面頁＋指標頁從第 8 頁起 ──
 PAGE_OF = {}
-_pg = 6
+_pg = 8
 for dm in DATA['dims']:
     PAGE_OF[f"d{dm['n']}"] = _pg; _pg += 1
     for ind in dm['inds']:
@@ -120,7 +120,7 @@ def pchip(label, pg, main=False):
 
 # 主要翻閱頁：預設為簡報「對應指標」標籤之第一項；P13、P21 依建議調整；P23、P24 指向專頁
 MAIN_OVERRIDE = {13: '3-3', 21: '6-1'}
-EXTRA_PAGE = {23: ('13 項建議', 29), 24: ('五項省思', 30)}
+EXTRA_PAGE = {23: ('13 項建議', 31), 24: ('五項省思', 32)}
 
 
 def slide_chips(p, codes):
@@ -148,7 +148,7 @@ def spread_left():
 <p class="lead">簡報以四項核心特質為軸線；本手冊依六大構面編排。左頁依簡報順序、右頁依指標；各指標之手冊頁碼見右頁最右欄。</p></header>
 <div class="legend"><span class="sub">依簡報順序</span><span class="chip main"><b>2-1</b></span>＝主要翻閱頁　<span class="chip"><b>4-2</b></span>＝延伸參考</div>
 {"".join(rows)}'''
-    return page(4, body, 'spread-l')
+    return page(6, body, 'spread-l')
 
 
 def spread_right():
@@ -175,7 +175,7 @@ def spread_right():
 <table class="mx"><thead><tr><th class="ich">指標</th>{th}<th class="mph">手冊頁</th></tr></thead>
 <tbody>{"".join(trs)}</tbody></table>
 <p class="mx-note">17 項指標在簡報中皆有落點。P4、P8、P12、P17 為章名頁（學生原話），P25 為結尾頁，未標示指標。</p>'''
-    return page(5, body, 'spread-r')
+    return page(7, body, 'spread-r')
 
 
 # ── 指標頁 ──
@@ -251,7 +251,7 @@ def dim_page(dm):
     rows = ''.join(f'<tr><td class="dt-c">{i["code"]}</td><td class="dt-t">{e(i["title"])}</td><td class="dt-w">{IND_WEIGHT[i["code"]]}</td><td class="dt-p">{PAGE_OF[i["code"]]}</td></tr>' for i in dm['inds'])
     cards = f'<table class="dtab"><thead><tr><th>指標</th><th></th><th>配分</th><th>手冊頁</th></tr></thead><tbody>{rows}</tbody></table>'
     ri = RESP_OF_DIM.get(dm['n'])
-    resp = (f'<p class="dp-r">前次評鑑（112 學年度）本構面委員建議 <b>{len(RESP[ri][1])} 項</b>，回應摘要見第 29 頁。</p>'
+    resp = (f'<p class="dp-r">前次評鑑（112 學年度）本構面委員建議 <b>{len(RESP[ri][1])} 項</b>，回應摘要見第 31 頁。</p>'
             if ri is not None else '<p class="dp-r">前次評鑑（112 學年度）本構面無具體建議事項。</p>')
     body = f'''<div class="dp-hero"><p class="kick">{diamond()}<span>構面{NUMZH[dm["n"]]}</span></p>
 <p class="dp-n">{NUMZH[dm["n"]]}</p><h1 class="dp-t">{e(name)}</h1>
@@ -265,13 +265,13 @@ def dim_page(dm):
 def toc_page():
     guide = [
         '本手冊依評鑑六大構面編排，每項指標一頁，依序為指標原文、簡報對應、學校現況說明（摘要）、關鍵數字與照片，頁底留有筆記欄。',
-        '簡報以四項核心特質為軸線；簡報各頁對應之指標與手冊頁碼，見第 4–5 頁。',
+        '簡報以四項核心特質為軸線；簡報各頁對應之指標與手冊頁碼，見第 6–7 頁。',
         '頁面外緣之色塊為構面索引（一至六），可快速翻至各構面。',
         '17 項指標完整內容請見評鑑網站，網址與 QR code 見封底。',
     ]
     g = ''.join(f'<li>{e(t)}</li>' for t in guide)
-    front = [('學校概況', 3), ('四項核心特質 × 17 項指標', 4)]
-    back = [('前次評鑑 13 項建議回應摘要', 29), ('民族教育省思', 30), ('綜合座談筆記', 31), ('評鑑網站', 32)]
+    front = [('學校概況', 3), ('評鑑網站（3D 導覽）使用指南', 4), ('四項核心特質 × 17 項指標', 6)]
+    back = [('前次評鑑 13 項建議回應摘要', 31), ('民族教育省思', 32), ('綜合座談筆記', 33), ('評鑑網站', 36)]
     def row(t, p, cls=''):
         return f'<li class="{cls}"><span class="tt">{t}</span><span class="dots"></span><span class="tp">{p}</span></li>'
     dims = ''
@@ -316,7 +316,7 @@ def profile_page():
     return page(3, body, 'prof')
 
 
-# ── 第 29 頁：前次 13 項建議回應 ──
+# ── 第 31 頁：前次 13 項建議回應 ──
 def resp_page():
     rows, k = '', 0
     for grp, items in RESP:
@@ -328,10 +328,10 @@ def resp_page():
 <h1>前次 13 項建議，逐項回應</h1>
 <p class="lead">依「宜蘭縣 112 學年度原住民族實驗教育評鑑結果報告書」委員書面審查意見摘錄，對照本校回應作法。112 學年度六個項目與本次構面相同；項目五（相關法規之遵行）委員未提具體建議。</p></header>
 <table class="rt"><thead><tr><th></th><th>委員建議（摘要）</th><th>本校回應（摘要）</th></tr></thead><tbody>{rows}</tbody></table>'''
-    return page(29, body, 'respp')
+    return page(31, body, 'respp')
 
 
-# ── 第 30 頁：五項省思 ──
+# ── 第 32 頁：五項省思 ──
 def refl_page():
     nm = '一二三四五'
     blocks = ''
@@ -342,11 +342,11 @@ def refl_page():
     body = f'''<header class="sh"><p class="kick">{diamond()}<span>民族教育省思</span><span class="pg-ref">簡報 P24｜指標 6-3</span></p>
 <h1>我們持續追問的五個問題</h1></header>
 <div class="rfs">{blocks}</div>'''
-    return page(30, body, 'reflp')
+    return page(32, body, 'reflp')
 
 
-def notes_page(num):
-    body = f'''<header class="sh"><p class="kick">{diamond()}<span>綜合座談</span></p><h1>綜合座談筆記</h1></header>
+def notes_page(num, kick='綜合座談', title='綜合座談筆記'):
+    body = f'''<header class="sh"><p class="kick">{diamond()}<span>{kick}</span></p><h1>{title}</h1></header>
 <div class="notes full"><div class="lines">{LINES}</div></div>'''
     return page(num, body, 'notes-p')
 
@@ -364,18 +364,19 @@ def back_cover(num):
     return page(num, body, 'back', foot=False)
 
 
-CSS = (ROOT / 'book.css').read_text()
+from guide_pages import guide_pages, CSS as GUIDE_CSS
+CSS = (ROOT / 'book.css').read_text() + GUIDE_CSS
 
 
 def build(mode, bleed):
     if mode == 'sample':
-        pages = [cover(), spread_left(), spread_right(), ind_page('3-4'), notes_page(31), back_cover(32)]
+        pages = [cover(), *guide_pages(4, diamond), spread_left(), spread_right(), ind_page('3-4'), back_cover(36)]
     else:
-        pages = [cover(), toc_page(), profile_page(), spread_left(), spread_right()]
+        pages = [cover(), toc_page(), profile_page(), *guide_pages(4, diamond), spread_left(), spread_right()]
         for dm in DATA['dims']:
             pages.append(dim_page(dm))
             pages += [ind_page(i['code']) for i in dm['inds']]
-        pages += [resp_page(), refl_page(), notes_page(31), back_cover(32)]
+        pages += [resp_page(), refl_page(), notes_page(33), notes_page(34, '筆記', '筆記'), notes_page(35, '筆記', '筆記'), back_cover(36)]
     b = 3 if bleed else 0
     doc = f'''<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
 <style>:root{{--b:{b}mm;--z:{210/182}}} @page{{size:{210 + 2 * b}mm {297 + 2 * b}mm;margin:0}}</style>
@@ -394,7 +395,7 @@ def pdf(htmlp, pdfp):
         pg.wait_for_load_state('networkidle')
         # 溢出檢查
         over = pg.evaluate('''() => [...document.querySelectorAll('.page')].map(s => {
-            const m = s.querySelector('.m'); return [s.dataset.n, m.scrollHeight - m.clientHeight]}).filter(a => a[1] > 1)''')
+            const m = s.querySelector('.m, .gm'); return [s.dataset.n, m.scrollHeight - m.clientHeight]}).filter(a => a[1] > 1)''')
         if over: print('⚠ 溢出：', over)
         pg.pdf(path=str(pdfp), prefer_css_page_size=True, print_background=True)
         br.close()
